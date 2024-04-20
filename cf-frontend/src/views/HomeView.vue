@@ -1,0 +1,181 @@
+<template>
+	<div class="container">
+		<div class="container-top">
+			<div class="box">
+				<div class="header">
+					<div><b>访问数</b></div>
+					<div></div>
+					<div class="sub-box" id="year">年</div>
+				</div>
+				<div class="content">2000</div>
+				<div class="footer">
+					<div class="total">总访问数</div>
+					<div>20000</div>
+				</div>
+			</div>
+			<div class="box">
+				<div class="header">
+					<div><b>成交额</b></div>
+					<div></div>
+					<div class="sub-box" id="month">月</div>
+				</div>
+				<div class="content">3000</div>
+				<div class="footer">
+					<div class="total">总成交额</div>
+					<div>30000</div>
+				</div>
+			</div>
+			<div class="box">
+				<div class="header">
+					<div><b>下载数</b></div>
+					<div></div>
+					<div class="sub-box" id="week">周</div>
+				</div>
+				<div class="content">4000</div>
+				<div class="footer">
+					<div class="total">总下载数</div>
+					<div>40000</div>
+				</div>
+			</div>
+			<div class="box">
+				<div class="header">
+					<div><b>成交量</b></div>
+					<div></div>
+					<div class="sub-box" id="day">日</div>
+				</div>
+				<div class="content">5000</div>
+				<div class="footer">
+					<div class="total">总成交量</div>
+					<div>50000</div>
+				</div>
+			</div>
+		</div>
+		<ChartOne></ChartOne>
+	</div>
+</template>
+
+
+<script>
+import ChartOne from '@/components/ChartOne.vue';
+
+export default {
+	name: 'HomeView',
+	components: {
+		ChartOne
+	}
+}
+
+</script>
+
+<style>
+.container-top {
+	display: flex;
+	justify-content: space-between;
+	width: 80%;
+	margin: 25px auto;
+}
+
+.box {
+	width: 23%;
+	/* 每个矩形宽度占比 */
+	height: 160px;
+
+	background-color: white;
+	/* border: 1px solid #000; 显示边框 */
+	border-radius: 10px;
+	/* 圆角矩形 */
+	padding: 10px;
+	box-sizing: border-box;
+	/* 边框包含在盒子内 */
+}
+
+.header,
+.footer {
+	display: flex;
+	align-items: center;
+	height: 20%;
+}
+
+.header {
+	margin-bottom: 5px;
+	justify-content: space-between;
+}
+
+.footer {
+	justify-content: space-around;
+}
+
+.header>div:nth-child(1) {
+	flex-grow: 2;
+	/* 宽度比例为 2 */
+}
+
+.header>div:nth-child(2) {
+	flex-grow: 3;
+	/* 宽度比例为 4 */
+}
+
+.header>div:nth-child(3) {
+	flex-grow: 1;
+	/* 宽度比例为 1 */
+}
+
+
+.content {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 60%;
+	font-size: 24px;
+	font-weight: bold;
+
+	border-top: 1px solid #000;
+	/* 设置上边框 */
+	/* border-bottom: 1px solid #000; 设置下边框 */
+	/* padding: 5px; 内边距 */
+}
+
+.header div,
+.footer div {
+	/* flex: 1; */
+	display: flex;
+	align-items: center;
+}
+
+.sub-box {
+	width: 10px;
+	height: 20px;
+	border-radius: 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#year {
+	background-color: rgb(246, 255, 237);
+	border: 1px solid rgb(183, 235, 143);
+	color: rgb(56, 185, 13);
+}
+
+#month {
+	background-color: rgb(230, 244, 255);
+	border: 1px solid rgb(145, 202, 255);
+	color: rgb(9, 88, 217);
+}
+
+#week {
+	background-color: rgb(255, 247, 230);
+	border: 1px solid rgb(255, 213, 145);
+	color: rgb(212, 107, 8);
+}
+
+#day {
+	background-color: rgb(249, 240, 255);
+	border: 1px solid rgb(211, 173, 247);
+	color: rgb(83, 29, 171);
+}
+
+.total {
+	text-align: center;
+}
+</style>
