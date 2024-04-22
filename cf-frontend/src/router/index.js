@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import ProjectsView from '../views/ProjectsView.vue'
 import RaiseView from '../views/RaiseView.vue'
 import PersonalView from '../views/PersonalView.vue'
+import ProjectDetails from '../views/ProjectDetails.vue'
 
 const routes = [
     {
@@ -25,6 +26,11 @@ const routes = [
         name: 'personal',
         component: PersonalView
     },
+    {
+        path: '/project/:id',
+        name: 'ProjectDetails',
+        component: ProjectDetails
+    },    
     // {
     //   path: '/about',
     //   name: 'about',
