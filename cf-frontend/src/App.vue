@@ -1,21 +1,25 @@
 <template>
-    <nav>
+    <nav id="top-bar">
         <div class="nav">
-            <div class="nav-item" :class="{ 'active': $route.path === '/' }">
-                <router-link to="/">ChainFund主页</router-link>
+            <div class="nav-item" :class="{ 'active': $route.path === '/home' }">
+                <router-link to="/home">ChainFund主页</router-link>
             </div>
             <div class="nav-item" :class="{ 'active': $route.path === '/projects' }">
                 <router-link to="/projects">项目广场</router-link>
             </div>
-            <div class="nav-item" :class="{ 'active': $route.path === '/raise' }">
+            <div class="nav-item" id="raise" :class="{ 'active': $route.path === '/raise' }">
                 <router-link to="/raise">发起众筹</router-link>
+            </div>
+            <div class="nav-item" :class="{ 'active': $route.path === '/mine' }">
+                <router-link to="/mine">我的项目</router-link>
             </div>
             <div class="nav-item" :class="{ 'active': $route.path === '/personal' }">
                 <router-link to="/personal">个人主页</router-link>
             </div>
         </div>
     </nav>
-    <router-view />
+    
+    <router-view></router-view>
 </template>
 
 <style lang="scss">
@@ -80,4 +84,6 @@ nav {
     }
 }
 
-</style>
+// #raise {
+//     font-size: large;
+// }</style>
