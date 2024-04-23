@@ -4,9 +4,9 @@ import ProjectsView from '../views/ProjectsView.vue'
 import RaiseView from '../views/RaiseView.vue'
 import MineView from '../views/MineView.vue'
 import PersonalView from '../views/PersonalView.vue'
+import ProjectDetails from '../views/ProjectDetails.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
-
 
 const routes = [
     {
@@ -35,6 +35,10 @@ const routes = [
         component: PersonalView
     },
     {
+        path: '/project/:id',
+        name: 'ProjectDetails',
+        component: ProjectDetails
+    },    
         path: '/login',
         name: 'login',
         component: LoginView
@@ -43,7 +47,7 @@ const routes = [
         path: '/register',
         name: 'register',
         component: RegisterView
-    }
+    },
     // {
     //   path: '/about',
     //   name: 'about',
