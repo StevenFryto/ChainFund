@@ -48,21 +48,23 @@ $$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right
 
 ### 对比损失：
 旨在区分正面和负面文本输入的输出嵌入。
-$$ \text{contrastive\_loss} = \text{mean}\left(\text{max}(0, \text{margin} - (pos\_output - neg\_output))\right) $$
+$$ {contrastive\_loss} = {mean}\left({max}(0, {margin} - (pos\_output - neg\_output))\right) $$
 
 ### 时长损失：
+
 预测与实际互动时长之间的均方误差。
-$$ \text{duration\_loss} = \text{MSE}(predicted\_duration, true\_duration) $$
+$$ {duration\_loss} = {MSE}(predicted\_duration, true\_duration) $$
 
 ### 用户预测损失：
 对基于互动数据预测的用户进行交叉熵损失。
-$$ \text{user\_prediction\_loss} = \text{CrossEntropy}(predicted\_user, true\_user) $$
+$$ {user\_prediction\_loss} = {CrossEntropy}(predicted\_user, true\_user) $$
 
 ## DynamicLossWeights
 
 一个类，用于根据它们的性能动态调整每个损失函数的权重，以促进模型稳定性并专注于训练难度较高的方面。
 
 ### 更新机制：
+
 每个损失的权重与它们最近的值成反比，归一化总和为一：
 $$ \text{new\_weight} = \frac{1/\text{loss}}{\sum(1/\text{losses})} $$
 
