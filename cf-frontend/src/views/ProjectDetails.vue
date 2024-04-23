@@ -3,43 +3,42 @@
         <el-card class="detail-card">
             <div class="title">{{ project.title }}</div>
             <div class="time-cards">
-                <el-card class="time-card" shadow="hover">发布时间：{{ project.created }}</el-card>
+                <el-card class="time-card" shadow="hover">发布时间：{{ project.create_time }}</el-card>
                 <el-card class="time-card" shadow="hover">截止时间：{{ project.deadline }}</el-card>
             </div>
             <div class="funding-cards">
                 <el-card class="money-card" shadow="hover">
-                    <p>目标金额: {{ formatCurrency(project.goal) }} &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 已筹得金额: {{
-                        formatCurrency(project.raised) }}</p>
+                    <p>目标金额: {{ formatCurrency(project.target_amount) }} &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 已筹得金额: {{
+                        formatCurrency(project.current_amount) }}</p>
                 </el-card>
-                <el-progress type="circle" :percentage="percentage(project.goal, project.raised)" />
             </div>
             <el-card class="owner-card" @mouseover="handleMouseEnter" @mouseleave="handleMouseLeave">
                 <template v-if="showDetails">
                     <div class="owner-details">
                         <div>
                             <p><b>担保人信息</b></p>
-                            <p>姓名：{{ project.surety_info.surety_name }}</p>
-                            <p>身份证号：{{ project.surety_info.surety_id_card }}</p>
-                            <p>联系方式：{{ project.surety_info.surety_phone }}</p>
+                            <p>姓名：{{ project.surety_info.name }}</p>
+                            <p>身份证号：{{ project.surety_info.id_card }}</p>
+                            <p>联系方式：{{ project.surety_info.phone }}</p>
                         </div>
-                        <img :src="project.surety_info.surety_id_photo" alt="Owner Image" class="owner-image" />
                     </div>
                 </template>
                 <template v-else>
                     <div class="patient-info">
-                        {{ project.owner }} ({{ project.gender }}, {{ project.age }}岁) &nbsp;&nbsp;&nbsp; {{ project.job
+                        {{ project.patient_name }} ({{ project.patient_gender }}, {{ project.patient_birth }} 岁)
+                        &nbsp;&nbsp;&nbsp; {{ project.patient_occupation
                         }}
                     </div>
                 </template>
             </el-card>
             <div class="project-images">
-                <img v-for="(img, index) in project.images" :key="index" :src="img" alt="Project Image"
+                <img v-for="(img, index) in project.photos" :key="index" :src="img.src" alt="Project Image"
                     class="project-image" />
             </div>
             <div class="project-description">{{ project.description }}</div>
             <button @click="donate()">进行捐款</button>
             <div class="tags">
-                <el-card v-for="(tag, index) in project.tags" :key="index" class="tag"
+                <el-card v-for="(tag, index) in project.label" :key="index" class="tag"
                     :style="{ backgroundColor: colors[index % colors.length] }" shadow="hover">
                     #&nbsp;{{ tag }}
                 </el-card>
@@ -50,6 +49,7 @@
 
 <script>
 import { ElCard } from 'element-plus';
+import axios from 'axios';
 export default {
     components: {
         //ElRow,
@@ -65,28 +65,52 @@ export default {
     },
     methods: {
         fetchProject(id) {
+            const baseUrl = 'http://127.0.0.1:5000/getProjectDetails'; // 根据实际后端服务地址调整
+            axios.get(`${baseUrl}/${id}`)
+                .then(response => {
+                    console.log("get project details success!");
+                    console.log(response.data);
+                    this.project = response.data;
+
+                    // 如果photos是一个JSON字符串，先解析它
+                    if (typeof this.project.photos === 'string') {
+                        this.project.photos = JSON.parse(this.project.photos);
+                    }
+                    // 假设返回的photos是一个路径数组，将其转换为可由Vue模板解析的对象数组
+                    this.project.photos = this.project.photos.map(photo => {
+                        return {
+                            // 这里我们使用了动态导入，适用于已知图片放在静态资源文件夹中的情况
+                            src: require(`@/assets/${photo}`),
+                        };
+                    });
+                })
+                .catch(error => {
+                    this.error = error;
+                    console.error('请求错误:', error);
+                });
+            /*
             // 模拟的获取数据逻辑
             return {
                 id: id,
                 title: '战胜疾病：共同支持健康恢复',
-                created: '2024-4-21',
+                create_time: '2024-4-21',
                 deadline: '2024-7-31',
-                owner: '李明宇',
-                age: 44,
-                gender: '男',
-                job: '教师',
-                surety_info: { surety_name: '苏萨', surety_phone: '123123123', surety_id_card: '110110110110', surety_id_photo: require('@/assets/sample_2.webp') },
-                goal: 100000,
-                raised: 85000,
-                images: [
+                patient_name: '李明宇',
+                patient_birth: 44,
+                patient_gender: '男',
+                patient_occupation: '教师',
+                surety_info: { name: '苏萨', phone: '123123123', id_card: '110110110110' },
+                target_amount: 100000,
+                current_amount: 85000,
+                photos: [
                     require('@/assets/sample_1.webp'),
                     require('@/assets/sample_3.webp'),
                     require('@/assets/sample_4.webp'),
                     // 更多图片
                 ],
                 description: '这个众筹项目专注于帮助患有罕见的遗传性血液病——地中海贫血的患者。地中海贫血是一种由基因突变引起的疾病，导致体内不能正常生产血红蛋白，从而引起贫血、疲劳和发展迟缓。如果不进行治疗，这种病可能会威胁生命，治疗方法通常包括定期的血液输注和可能的骨髓移植。',
-                tags: ['紧急', '健康', '教育']
-            };
+                label: ['紧急', '健康', '教育']
+            };*/
         },
         formatCurrency(value) {
             return `$${value.toFixed(2)}`;
@@ -160,8 +184,8 @@ export default {
 .time-cards {
     display: flex;
     justify-content: space-between;
-    margin-left: 35%;
-    margin-right: 35%;
+    margin-left: 30%;
+    margin-right: 30%;
     margin-bottom: 10px;
 }
 
@@ -224,7 +248,7 @@ export default {
 
 .project-image {
     flex: 0 1 18%;
-    height: 250px;
+    height: 200px;
     /* 固定图片高度 */
     object-fit: cover;
     /* 保持图片比例 */
