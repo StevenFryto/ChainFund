@@ -8,7 +8,6 @@ import ProjectDetails from '../views/ProjectDetails.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 
-
 const routes = [
     {
         path: '/home',
@@ -49,7 +48,7 @@ const routes = [
         path: '/register',
         name: 'register',
         component: RegisterView
-    }
+    },
     // {
     //   path: '/about',
     //   name: 'about',

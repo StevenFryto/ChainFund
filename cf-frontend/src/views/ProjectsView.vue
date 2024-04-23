@@ -101,7 +101,11 @@ export default {
             return `$${value.toFixed(2)}`;
         },
         percentage(value_1, value_2) {
-            return `${(value_2 / value_1 * 100).toFixed(0)}`
+            value_1 = value_2 / value_1 * 100;
+            if (value_1 > 100){
+                value_1 = 100
+            }
+            return `${value_1.toFixed(0)}`
         },
         navigateToProject(projectId) {
             this.$router.push({ path: `/project/${projectId}` });
