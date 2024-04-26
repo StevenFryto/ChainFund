@@ -298,7 +298,8 @@ export default {
     /* 文字加粗 */
     border-radius: 5px;
     /* 圆角 */
-    font-size: 15px;
+    font-size: 12.5px;
+    font-weight: 600;
 }
 
 button {
@@ -312,7 +313,8 @@ button {
     margin-top: 30px;
     margin-bottom: 20px;
     border-radius: 15px;
-    font-size: large;
+    font-size: larger;
+    font-weight: bolder;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 </style>
