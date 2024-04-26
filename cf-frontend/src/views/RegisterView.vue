@@ -5,19 +5,25 @@
             <div class="loginbox">
                 <!-- 左侧的注册盒子 -->
                 <div class="loginbox-in">
+                    <!-- 用户头像上传 -->
+                    <input type="file" accept="image/*" @change="handleAvatarChange" ref="avatarInput"
+                        style="display: none">
+                    <div class="avatar-box">
+                        <img :src="avatarPreview" class="avatar-preview" alt="点击上传头像" @click="openAvatarInput">
+                    </div>
                     <div class="userbox">
                         <span class="iconfont">&#xe817;</span>
-                        <input class="user" id="user" v-model="name" placeholder="用户名">
+                        <input class="user" id="user" v-model="username" placeholder="用户名">
                     </div>
                     <br>
                     <div class="pwdbox">
                         <span class="iconfont">&#xe775;</span>
-                        <input class="pwd" id="password" v-model="pwd" type="password" placeholder="密码">
+                        <input class="pwd" id="password" v-model="password" type="password" placeholder="密码">
                     </div>
                     <br>
-                    <div class="pwdbox">
+                    <div class="emailbox">
                         <span class="iconfont">&#xe775;</span>
-                        <input class="pwd" id="re_password" v-model="repwd" type="password" placeholder="确认密码">
+                        <input class="email" id="email" v-model="email" type="email" placeholder="电子邮箱（可选）">
                     </div>
 
                     <br>
@@ -35,60 +41,60 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
     name: "RegisterView",
     data: function () {
         return {
-            name: '',
-            pwd: '',
-            repwd: '',
-            user_list: [
-                {
-                    username: 'admin',
-                    password: '123'
-                },
-
-            ]
+            username: '',
+            password: '',
+            email: '',
+            avatarFile: null,
+            avatarPreview: 'https://s2.loli.net/2024/04/23/6kLR41dJxe23bXv.jpg' // 用于预览用户头像的图片URL
         }
     },
     methods: {
-        register() {
-            var flag = 1;
-            //如果用户名已存在，则需要换一个用户名
-            this.user_list.forEach((item) => {
-                if (item.username == this.name) {
-                    alert('用户已存在,请换一个用户名');
-                    flag = 0;
-                }
+        openAvatarInput() {
+            this.$refs.avatarInput.click();
+        },
+        handleAvatarChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.avatarFile = file;
+                this.avatarPreview = URL.createObjectURL(file);
             }
-            )
-            //如果用户名不存在，则继续判断
-            if (flag) {
-                // 判断两次输入的密码是否一致，如果密码不一致，则需要重新输入
-                if (this.pwd != this.repwd) {
-                    alert('两次输入的密码不一致,请重新输入');
+        },
+        async register() {
+            try {
+                // 创建 FormData 对象，用于发送文件和其他数据
+                const formData = new FormData();
+                if (this.avatarFile != null) {
+                    formData.append('avatar', this.avatarFile);
+                } else {
+                    formData.append('avatar', '');
                 }
-                // 如果密码也一直，则存到用户列表里面
-                else {
-                    var item = {};
-                    // 获取到用户名
-                    item.username = this.name;
-                    // 获取到密码
-                    item.password = this.pwd;
-                    // 存储到用户列表
-                    this.user_list.push(item);
-                    alert('注册成功');
-                    //    this.user_list.forEach((item) => {
-                    //       console.log( item.username);
-                    // })
 
-                    this.$router.push({
-                        path: '/',
-                        query: {
-                            list: this.user_list,
-                        }
-                    })
+                formData.append('username', this.username);
+                formData.append('password', this.password);
+                formData.append('email', this.email);
+
+                const response = await axios.post('http://localhost:5000/user-register', formData);
+                console.log(response.data);
+
+                if (response.data.status === true) {
+                    const currentUserId = response.data.id;
+                    this.$router.push(`${currentUserId}/home`);
+                } else {
+                    alert("该用户名已注册，请重新输入");
+                    this.avatar = '';
+                    this.username = '';
+                    this.password = '';
+                    this.email = '';
                 }
+            } catch (error) {
+                console.log(error);
+                alert("出现错误，联系开发人员");
             }
         }
     }
@@ -96,6 +102,17 @@ export default {
 </script>
 
 <style scoped>
+img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover; 
+}
+
+.avatar-box {
+    margin-top: 10%;
+}
+
 .loginbox {
     display: flex;
     position: absolute;
@@ -113,12 +130,18 @@ export default {
 }
 
 .userbox {
-    margin-top: 40%;
+    margin-top: 20%;
     display: flex;
     margin-left: 10%;
 }
 
 .pwdbox {
+    margin-top: 10%;
+    display: flex;
+    margin-left: 10%;
+}
+
+.emailbox {
     margin-top: 10%;
     display: flex;
     margin-left: 10%;
@@ -226,7 +249,7 @@ input:-webkit-autofill::first-line {
     border-radius: 20px;
     outline: none;
 
-    margin-top: 40%;
+    margin-top: 20%;
     font-size: 16px;
 }
 

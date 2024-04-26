@@ -102,7 +102,7 @@ export default {
                 .then(response => {
                     this.projects = response.data.map(project => {
                         // 假设后端返回的是图片的文件名，需要拼接路径
-                        project.image = require(`@/assets/${project.image}`);
+                        project.image = require(`@/assets/projects/${project.image}`);
                         return project;
                     });
                 })
@@ -136,7 +136,7 @@ export default {
             return `${value_1.toFixed(0)}`
         },
         navigateToProject(projectId) {
-            this.$router.push({ path: `/project/${projectId}` });
+            this.$router.push({ path: `/${this.$route.params.userId}/project/${projectId}` });
         }
     },
     mounted() {
@@ -207,6 +207,7 @@ export default {
     /* 为容器添加内边距 */
     background-color: rgb(245, 245, 245);
     /* 设置背景颜色为白色 */
+    margin-left: 60px;
 }
 
 .project-container {
@@ -254,9 +255,11 @@ export default {
     padding-top: 5px;
     height: 140px;
     /* 图片宽度填满卡片 */
-    width: auto;
+    /* width: auto; */
+    width: 200px;
     /* 图片高度自适应 */
     margin-bottom: 15px;
+    object-fit: cover;
 }
 
 .project-funds {
@@ -309,7 +312,7 @@ export default {
 }
 
 .tag {
-    margin: 2px;
+    margin-left: 2px;
     /* 小间距使得标签不紧挨 */
     padding: 3px 8px;
     border-radius: 5px;
