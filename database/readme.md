@@ -9,7 +9,7 @@
 | id              | 主键         |
 | avatar          | 头像         |
 | username        | 用户名       |
-| password_hash   | 密码哈希     |
+| password        | 密码         |
 | email           | 邮箱         |
 | create_time     | 创建时间     |
 | raised_amount   | 已捐出的金额 |
@@ -20,14 +20,15 @@
 | 字段            | 描述             |
 | --------------- | ---------------- |
 | id              | 主键             |
+| surety_id      | 保证人id           |
 | title           | 标题             |
 | description     | 描述             |
-| surety_name     | 保证人姓名       |
-| surety_phone    | 保证人联系方式   |
-| surety_id_card  | 保证人身份证号码 |
-| surety_id_photo | 保证人身份证照片 |
-| patient_id      | 患者id           |
-| photo           | 患者目前状况照片 |
+| patient_name       | 患者姓名       |
+| patient_id_card   | 患者身份证号 |
+| patient_gender     | 患者性别       |
+| patient_birth        | 患者出生日期       |
+| patient_occupation | 患者职业       |
+| photos         | 患者目前状况照片 |
 | label           | 小标签           |
 | create_time     | 创建时间         |
 | deadline        | 截止日期         |
@@ -42,17 +43,21 @@
     * 疾病：心脏病、癌症、肿瘤、瘫痪、糖尿病、风湿病、癫痫、失明、失聪、骨折、脑中风、心肌梗塞
     * 类型：手术、化疗、慢性病管理、重症监护、康复治疗、药物、检查、康复设备
     * 用户自己填写：
+* label 标签存储时用`,`隔开，比如`标签1,标签2,...`
+* photos 存储格式为`["图片文件名1","图片文件名2","图片文件名3",...]`
+* 图片只存储文件名，不存储路径
 
 
-### 病人信息patient
+### 保证人信息surety
 
 | 字段       | 描述       |
 | ---------- | ---------- |
 | id         | 主键       |
-| name       | 姓名       |
-| gender     | 性别       |
-| age        | 年龄       |
-| occupation | 职业       |
+| name     | 保证人姓名       |
+| id_card  | 保证人身份证号码 |
+| phone    | 保证人联系方式   |
+| photo | 保证人照片 |
+
 
 ### 浏览记录表record
 
@@ -70,46 +75,48 @@
 CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     avatar VARCHAR(255),
-    username VARCHAR(255) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    email VARCHAR(255),
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    raised_amount DECIMAL(10, 2) DEFAULT 0,
+    raised_amount DECIMAL(10, 2),
     interest_matrix TEXT
 );
 
 -- 创建众筹项目表
 CREATE TABLE project (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id, INT NOT NULL,
+    surety_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    surety_name VARCHAR(255) NOT NULL,
-    surety_phone VARCHAR(20) NOT NULL,
-    surety_id_card VARCHAR(18) NOT NULL,
-    surety_id_photo VARCHAR(255),
-    patient_id INT NOT NULL,
-    photo VARCHAR(255),
+    patient_name VARCHAR(100) NOT NULL,
+    patient_id_card VARCHAR(20) NOT NULL,
+    patient_gender ENUM('male', 'female', 'other') NOT NULL,
+    patient_birth DATE NOT NULL,
+    patient_occupation VARCHAR(255),
+    photos TEXT,
     label VARCHAR(255),
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    deadline DATETIME,
+    deadline DATE,
     target_amount DECIMAL(10, 2),
-    current_amount DECIMAL(10, 2) DEFAULT 0
+    current_amount DECIMAL(10, 2)
 );
 
--- 创建病人信息表
-CREATE TABLE patient (
+-- 创建保证人信息表
+CREATE TABLE surety (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    gender VARCHAR(10),
-    age INT,
-    occupation VARCHAR(255)
+    name VARCHAR(100) NOT NULL,
+    id_card VARCHAR(20) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    photo VARCHAR(255)
 );
 
 -- 创建浏览记录表
 CREATE TABLE record (
     user_id INT,
     project_id INT,
-    duration DATETIME DEFAULT CURRENT_TIMESTAMP,
+    duration DATETIME,
     raised_amount DECIMAL(10, 2)
 );
 ```
@@ -129,3 +136,16 @@ CREATE TABLE record (
     }
 ```
 
+## 更改记录
+
+**user表**
+
+* 修改密码哈希为明文存储
+
+**surety表**
+
+* 增加头像字段photo
+
+**project表**
+
+* 增加用户id（不然只通过surety来让项目和用户连接起来是有问题的）

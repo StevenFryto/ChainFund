@@ -80,7 +80,7 @@ export default {
                     this.project.photos = this.project.photos.map(photo => {
                         return {
                             // 这里我们使用了动态导入，适用于已知图片放在静态资源文件夹中的情况
-                            src: require(`@/assets/${photo}`),
+                            src: require(`@/assets/projects/${photo}`),
                         };
                     });
                 })

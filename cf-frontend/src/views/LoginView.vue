@@ -7,12 +7,12 @@
                 <div class="loginbox-in">
                     <div class="userbox">
                         <span class="iconfont">&#xe817;</span>
-                        <input class="user" id="user" v-model="name" placeholder="用户名">
+                        <input class="user" id="user" v-model="username" placeholder="用户名">
                     </div>
                     <br>
                     <div class="pwdbox">
                         <span class="iconfont">&#xe775;</span>
-                        <input class="pwd" id="password" type="password" v-model="pwd" placeholder="密码">
+                        <input class="pwd" id="password" type="password" v-model="password" placeholder="密码">
                     </div>
                     <br>
                     <div class="log-box">
@@ -36,75 +36,43 @@
 </template>
 
 <script>
+// import { Axios } from 'axios';
+import axios from 'axios';
+
 export default {
     name: "LoginView",
-    data: function () {
+    data: () => {
         return {
-            name: '',
-            pwd: '',
-            user_list: [
-                {
-                    id: '1',
-                    username: 'admin',
-                    password: '123'
-                },
-            ]
-
+            username: '',
+            password: ''
         }
     },
+    inject: ['getCurrentUserId', 'setCurrentUserId'],
     methods: {
-        register() { this.$router.push("Register") },
-
-        // getParams: function () {
-        //         // 取到路由带过来的参数
-        //         var routerParams = this.$route.query.list;
-        //         this.user_list = routerParams;
-        // },
-        login() {
-            var flag = 1;
-            //如果是有参数传递
-            if (!this.$route.query.list) {
-                this.user_list.forEach((item) => {
-                    if (item.username == this.name) {
-                        if (item.password == this.pwd) {
-                            flag = 1;//用户存在，并且密码正确
-                        }
-                    }
-                }
-                )
-                if (flag == 1) {
-                    //可以跳转到主页
-                    this.$router.push("home");
-                }
-                else {
+        register() { this.$router.push("register") },
+        async login() {
+            try {
+                const response = await axios.post('http://localhost:5000/user-login', {
+                    username: this.username,
+                    password: this.password
+                })
+                console.log(response.data);
+                
+                if (response.data.status === true) {
+                    const currentUserId = response.data.id;
+                    // this.setCurrentUserId(currentUserId);
+                    // this.$router.push(`${currentUserId}/home`);
+                    this.$router.push(`${currentUserId}/home`);
+                } else {
                     alert("用户名或密码错误，请重新输入");
+                    this.username = '';
+                    this.password = '';
                 }
+            } catch (error) {
+                console.log(error);
+                alert("出现错误，联系开发人员");
             }
-            else {
-                // 取到路由带过来的参数
-                var routerParams = this.$route.query.list;
-                this.user_list = routerParams;
-                this.user_list.forEach((item) => {
-                    if (item.username == this.name) {
-                        if (item.password == this.pwd) {
-                            flag = 1;//用户存在，并且密码正确
-                        }
-                    }
-                }
-                )
-                if (flag == 1) {
-                    //可以跳转到主页
-                    // this.$router.push("Homepage");
-                    this.$router.push({
-                        path: '"Homepage',
-                    }
-                    )
-                }
-                else {
-                    alert("用户名或密码错误，请重新输入");
-                }
-            }
-        },
+        }
     },
 }
 </script>

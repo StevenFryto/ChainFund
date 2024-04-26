@@ -1,103 +1,144 @@
 <template>
     <div class="related-projects">
-        <div v-for="(project, index) in projects" :key="index" class="project"
-            :style="{ backgroundColor: project.raisedAmount >= project.neededAmount ? '#FFC0CB' : '#7ad2ba' }">
-            <div class="project-left">
-                <img :src="project.image" alt="Project Image" class="project-image">
-            </div>
-            <div class="project-center">
-                <div class="project-title">{{ project.title }}</div>
-                <div class="project-description">{{ project.description }}</div>
-                <div class="project-tags">
-                    <div v-for="(tag, tagIndex) in project.tags" :key="tagIndex" class="tag"
-                        :style="{ backgroundColor: tag.color }">{{ tag.name }}</div>
+        <div class="published">
+            <div class="title">🔴 <b>您发布的项目</b></div>
+            <div v-if="publishedProjects.length == 0" class="no-project">未查询到数据，点击👉发起众筹👈试试吧！</div>
+            <div v-for="(project, index) in publishedProjects" :key="index" class="project"
+                :style="{ backgroundColor: project.current_amount < project.target_amount ? '#FFC0CB' : '#7ad2ba' }">
+                <div class="project-left">
+                    <img :src="project.photos" alt="Project Image" class="project-image">
                 </div>
-            </div>
-            <div class="project-right">
-                <div class="amount-info">
-                    <div class="raised-amount">已筹金额: 
-                        <div class="amount-number">${{ project.raisedAmount }}</div>
+                <div class="project-center">
+                    <div class="project-title">{{ project.title }}</div>
+                    <div class="project-description">{{ project.description }}</div>
+                    <div class="project-tags">
+                        <div v-for="(tag, tagIndex) in project.label.split(',')" :key="tagIndex" class="tag"
+                            :style="{ backgroundColor: getRandomColor() }">{{ tag }}</div>
                     </div>
-                    <div class="needed-amount">需要金额: 
-                        <div class="amount-number">${{ project.neededAmount }}</div>
+                </div>
+                <div class="project-right">
+                    <div class="amount-info">
+                        <div class="raised-amount">已筹金额:
+                            <div class="amount-number">${{ project.current_amount }}</div>
+                        </div>
+                        <div class="needed-amount">需要金额:
+                            <div class="amount-number">${{ project.target_amount }}</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <div class="raiseded">
+            <div class="title">🟢 <b>您参与的项目</b></div>
+            <div v-if="raisedProjects.length == 0" class="no-project">未查询到数据，点击👉项目广场👈看看吧！</div>
+            <div v-for="(project, index) in raisedProjects" :key="index" class="project"
+                :style="{ backgroundColor: project.current_amount >= project.target_amount ? '#FFC0CB' : '#7ad2ba' }">
+                <div class="project-left">
+                    <img :src="project.photos" alt="Project Image" class="project-image">
+                </div>
+                <div class="project-center">
+                    <div class="project-title">{{ project.title }}</div>
+                    <div class="project-description">{{ project.description }}</div>
+                    <div class="project-tags">
+                        <div v-for="(tag, tagIndex) in project.label.split(',')" :key="tagIndex" class="tag"
+                            :style="{ backgroundColor: getRandomColor() }">{{ tag }}</div>
+                    </div>
+                </div>
+                <div class="project-right">
+                    <div class="amount-info">
+                        <div class="raised-amount">已筹金额:
+                            <div class="amount-number">${{ project.current_amount }}</div>
+                        </div>
+                        <div class="needed-amount">需要金额:
+                            <div class="amount-number">${{ project.target_amount }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
     data() {
         return {
-            projects: [
-                {
-                    title: '帮助小明战胜白血病，拯救他的生命',
-                    description: '小明是一个充满活力的孩子，但他最近被确诊患有白血病。他需要进行长期的治疗和贵重的药物，但是他的家庭无法负担这样高昂的费用。我们希望能够伸出援手，帮助小明度过难关，重新踏上健康的道路。',
-                    image: 'https://th.bing.com/th/id/R.222dd6d4f4137e0b00c8fd0b0c2cd000?rik=ER4bVVbu8E%2fw%2bw&riu=http%3a%2f%2fpimg.39.net%2fPictureLib%2fA%2ff80%2fc9%2f20161227%2forg%2f845132.jpg&ehk=XyMzslmAhaTx%2beRn%2bwrWHJbjz7%2bqYRIDPPmWa%2fRKzKs%3d&risl=&pid=ImgRaw&r=0',
-                    tags: [
-                        { name: '白血病', color: '#ADD8E6' },
-                        { name: '儿童', color: '#F08080' },
-                        { name: '慢性病管理', color: '#FFD700' },
-                        { name: '药物', color: '#ADD8E6' }
-                    ],
-                    raisedAmount: 5200,
-                    neededAmount: 30000
-                },
-                {
-                    title: '支持王大夫治疗肺癌，为他祈福',
-                    description: '王大夫是一位敬业的医生，但是最近他被确诊患有晚期肺癌。他需要进行紧急的手术和放疗治疗，但是这些治疗费用非常昂贵。我们希望能够众筹足够的资金，帮助王大夫早日康复，继续为社会做出贡献。',
-                    image: 'https://ts1.cn.mm.bing.net/th/id/R-C.a84fbfeb76702e5fe6a7a8741f1fd5db?rik=4EGjYUg7%2fFVFpA&riu=http%3a%2f%2fi2.sinaimg.cn%2fdy%2fc%2f2013-09-07%2f1378492195_X9w3BT.jpg&ehk=3tYMQ%2bJeaKiggvNJpznE6%2f64pdQRykYGFCbLHsEChyg%3d&risl=&pid=ImgRaw&r=0&sres=1&sresct=1',
-                    tags: [
-                        { name: '癌症', color: '#FFA07A' },
-                        { name: '化疗', color: '#DDA0DD' },
-                        { name: '医生', color: '#F08080' }
-                    ],
-                    raisedAmount: 65000,
-                    neededAmount: 50000
-                },
-                {
-                    title: '帮助张阿姨支付心脏手术费用，拯救她的生命',
-                    description: '张阿姨是一个善良而坚强的人，但她最近被确诊患有严重的心脏病。她需要进行紧急的心脏手术，但是手术费用非常昂贵，她的家庭无法负担。我们希望能够众筹足够的资金，帮助张阿姨早日康复。',
-                    image: 'https://www.wahh.com.cn/Sites_OldFiles/UploadFiles/news/2015/9/201509091540338708.jpg',
-                    tags: [
-                        { name: '心脏病', color: '#FFA07A' },
-                        { name: '手术', color: '#F08080' },
-                        { name: '药物费用', color: '#FFD700' },
-                    ],
-                    raisedAmount: 15000,
-                    neededAmount: 20000
-                },
-                {
-                    title: '支持李叔叔抗击脑瘤，为他祈福',
-                    description: '李叔叔是我们社区的一位著名人士，但是最近他被确诊患有脑瘤。他需要进行复杂的手术和放疗治疗，但是这些治疗费用非常昂贵。我们希望能够众筹足够的资金，帮助李叔叔战胜疾病，重获健康。',
-                    image: 'https://4g.lsznk.com/wzuploads/allimg/170304/6-1F304142212W6.jpg',
-                    tags: [
-                        { name: '脑瘤', color: '#ADD8E6' },
-                        { name: '手术', color: '#FFA07A' },
-                        { name: '放疗治疗', color: '#DDA0DD' },
-                    ],
-                    raisedAmount: 100000,
-                    neededAmount: 60000
-                }
-            ]
-
+            publishedProjects: [],
+            raisedProjects: [],
         };
+    },
+    created() {
+        this.fetchPublishedProjects();
+        this.fetchRaisedProjects();
+    },
+    methods: {        
+        async fetchPublishedProjects() {
+            const currentUserId = this.$route.params.userId;
+            try {
+                const response = await axios.get(`http://localhost:5000/my_published_projects?id=${currentUserId}`);
+                this.publishedProjects = response.data.projects;
+                this.publishedProjects.forEach(project => {
+                    project.photos = require(`@/assets/projects/${JSON.parse(project.photos)[0]}`)
+                    
+                    // console.log(typeof parseInt(project.current_amount));
+                    project.current_amount = parseInt(project.current_amount);
+                    project.target_amount = parseInt(project.target_amount);
+                })
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+            }
+        },
+        async fetchRaisedProjects() {
+            const currentUserId = this.$route.params.userId;
+            try {
+                const response = await axios.get(`http://localhost:5000/my_raised_projects?id=${currentUserId}`);
+                this.raisedProjects = response.data.projects;
+                this.raisedProjects.forEach(project => {
+                    project.photos = require(`@/assets/projects/${JSON.parse(project.photos)[0]}`)
+                    
+                    // console.log(typeof parseInt(project.current_amount));
+                    project.current_amount = parseInt(project.current_amount);
+                    project.target_amount = parseInt(project.target_amount);
+                })
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+            }
+        },
+        getRandomColor() {
+            const colors = ['#FF6347', '#4682B4', '#32CD32', '#FFD700', '#6A5ACD', '#FF4500', '#20B2AA'];
+            const randomIndex = Math.floor(Math.random() * colors.length);
+            return colors[randomIndex];
+            // return '#' + Math.floor(Math.random() * 16777215).toString(16);
+        }
     }
 };
 </script>
 
 <style scoped>
+.no-project {
+    font-size: x-large;
+}
+
 .related-projects {
     width: 70%;
     margin: 0 auto;
 }
 
+.title {
+    text-align: left;
+    margin-top: 3%;
+    margin-bottom: 3%;
+    font-size: large;
+}
+
 .project {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     border-radius: 10px;
 
     transition: transform 0.5s ease;
@@ -112,8 +153,8 @@ export default {
 }
 
 .project-image {
-    width: 220px;
-    height: 220px;
+    width: 210px;
+    height: 200px;
 
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
@@ -128,7 +169,7 @@ export default {
 
 .project-center {
     flex: 5;
-    height: 240px;
+    height: 200px;
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -158,6 +199,9 @@ export default {
     margin-right: 5px;
     margin-bottom: 5px;
     border-radius: 5px;
+    font-size: small;
+
+    box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
 .project-right {
@@ -165,7 +209,7 @@ export default {
 }
 
 .amount-info {
-    height: 220px;
+    height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;

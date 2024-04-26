@@ -10,35 +10,44 @@ import RegisterView from '../views/RegisterView.vue'
 
 const routes = [
     {
-        path: '/home',
-        name: 'home',
-        component: HomeView
+        path: '/',
+        redirect: '/login'
     },
     {
-        path: '/projects',
-        name: 'projects',
-        component: ProjectsView
+        path: '/:userId',
+        children: [
+            {
+                path: 'home',
+                name: 'home',
+                component: HomeView
+            },
+            {
+                path: 'projects',
+                name: 'projects',
+                component: ProjectsView
+            },
+            {
+                path: 'raise',
+                name: 'raise',
+                component: RaiseView
+            },
+            {
+                path: 'mine',
+                name: 'mine',
+                component: MineView
+            },
+            {
+                path: 'personal',
+                name: 'personal',
+                component: PersonalView
+            },
+            {
+                path: 'project/:id',
+                name: 'ProjectDetails',
+                component: ProjectDetails
+            },
+        ]
     },
-    {
-        path: '/raise',
-        name: 'raise',
-        component: RaiseView
-    },
-    {
-        path: '/mine',
-        name: 'mine',
-        component: MineView
-    },
-    {
-        path: '/personal',
-        name: 'personal',
-        component: PersonalView
-    },
-    {
-        path: '/project/:id',
-        name: 'ProjectDetails',
-        component: ProjectDetails
-    },  
     {
         path: '/login',
         name: 'login',
@@ -48,15 +57,7 @@ const routes = [
         path: '/register',
         name: 'register',
         component: RegisterView
-    },
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (about.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-    // }
+    }
 ]
 
 const router = createRouter({

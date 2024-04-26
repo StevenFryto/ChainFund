@@ -3,26 +3,17 @@ from flask_cors import CORS
 import pymysql
 from datetime import datetime
 
-# 创建Flask应用和CORS
-app = Flask(__name__)
-CORS(app)
+from config.config import DB_CONFIG
+
 
 # 创建Blueprint
 getProjectDetails_bp = Blueprint("getProjectDetails", __name__)
 
+# 连接数据库
+connection = pymysql.connect(**DB_CONFIG)
+
 @getProjectDetails_bp.route("/getProjectDetails/<int:id>", methods=["GET"])
 def fetch_project(id):
-    # 连接数据库
-    connection = pymysql.connect(
-        host="localhost",
-        user="root",
-        port=3306,
-        password="Doncic77++",
-        db="chainfund",
-        charset="utf8mb4",
-        cursorclass=pymysql.cursors.DictCursor,
-    )
-
     try:
         with connection.cursor() as cursor:
             # 执行SQL查询获取项目信息
@@ -64,10 +55,6 @@ def fetch_project(id):
             else:
                 return jsonify({"message": "项目未找到"}), 404
     finally:
-        connection.close()
+        # connection.close()
+        pass
 
-# 注册Blueprint
-app.register_blueprint(getProjectDetails_bp)
-
-# if __name__ == "__main__":
-#     app.run(debug=True, port=5050)
