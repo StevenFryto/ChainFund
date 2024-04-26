@@ -1,4 +1,15 @@
 <template>
+    <div class="search-bar-container">
+        <input type="text" v-model="searchQuery" @input="fetchSearchResults" placeholder="搜索相关项目" class="search-bar" />
+        <button @click="fetchSearchResults" class="search-button">搜索</button>
+    </div>
+
+    <div class="dropdown-menu" v-if="searchResults.length">
+        <div v-for="result in searchResults" :key="result.id" @click="navigateToProject(result.id)"
+            class="dropdown-item">
+            {{ result.title }}
+        </div>
+    </div>
     <div class="projects" v-if="projects">
         <div class="project-container">
             <div class="project-card" shadow="always" v-for="project in projects" :key="project.id"
@@ -25,7 +36,7 @@
                     </div>
                     <div class="label-container">
                         <el-card v-for="(tag, index) in project.label" :key="index" class="tag"
-                            :style="{ backgroundColor: colors[index % colors.length] }">
+                            :style="{ backgroundColor: colors[(index + project.id) % colors.length] }">
                             # {{ tag }}
                         </el-card>
                     </div>
@@ -77,6 +88,8 @@ export default {
                     label: ['海洋', '清洁']
                 }
             ],*/
+            searchQuery: '',
+            searchResults: [],
             projects: null,
             colors: ['#FF6347', '#4682B4', '#32CD32', '#FFD700', '#6A5ACD', '#FF4500', '#20B2AA'],
         };
@@ -97,12 +110,27 @@ export default {
                     console.error('请求项目数据失败:', error);
                 });
         },
+        fetchSearchResults() {
+            if (!this.searchQuery.trim()) {
+                this.searchResults = [];
+                return;
+            }
+            axios.get(`http://localhost:5000/search?query=${encodeURIComponent(this.searchQuery)}`)
+                .then(response => {
+                    this.searchResults = response.data;
+                })
+                .catch(error => {
+                    console.error('搜索请求失败:', error);
+                    this.searchResults = [];
+                });
+        },
+
         formatCurrency(value) {
             return `$${value.toFixed(2)}`;
         },
         percentage(value_1, value_2) {
             value_1 = value_2 / value_1 * 100;
-            if (value_1 > 100){
+            if (value_1 > 100) {
                 value_1 = 100
             }
             return `${value_1.toFixed(0)}`
@@ -118,6 +146,62 @@ export default {
 </script>
 
 <style scoped>
+.search-bar-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.search-bar {
+    width: 30%;
+    padding-left: 20px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+.search-button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-weight: 700;
+}
+
+.dropdown-menu {
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 30%;
+    left: 48%;
+    transform: translateX(-50%);
+    z-index: 100;
+    border-radius: 5px;
+}
+
+.dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+    font-size: smaller;
+    text-align: left; /* 文本左对齐 */
+    /* border-bottom: 1px solid #ddd; /* 添加灰色边框 */
+    margin: 0; /* 移除任何默认边距 */
+    box-sizing: border-box; /* 确保包括padding和border在内的总宽度和高度 */
+}
+
+.dropdown-item:not(:last-child) {
+    border-bottom: 1px solid #ddd;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+
 .projects {
     padding: 20px;
     /* 为容器添加内边距 */
@@ -248,20 +332,30 @@ export default {
 }
 
 .progress-container {
-    width: 100%; /* 进度条的总宽度 */
-    background-color: #e5e5e5; /* 进度条的背景颜色 */
-    border-radius: 15px; /* 如果你喜欢圆角可以设置这个值 */
-    height: 12px; /* 进度条的高度 */
+    width: 100%;
+    /* 进度条的总宽度 */
+    background-color: #e5e5e5;
+    /* 进度条的背景颜色 */
+    border-radius: 15px;
+    /* 如果你喜欢圆角可以设置这个值 */
+    height: 12px;
+    /* 进度条的高度 */
 }
 
 .progress-bar {
-    height: 100%; /* 进度条的高度 */
-    background-color: #4caf50; /* 进度条的颜色 */
-    border-radius: 15px; /* 圆角 */
-    text-align: right; /* 文本对齐 */
-    color: white; /* 文本颜色 */
-    line-height: 20px; /* 行高与进度条高度相同，使文字垂直居中 */
-    padding-right: 5px; /* 文本与进度条右边界的距离 */
+    height: 100%;
+    /* 进度条的高度 */
+    background-color: #4caf50;
+    /* 进度条的颜色 */
+    border-radius: 15px;
+    /* 圆角 */
+    text-align: right;
+    /* 文本对齐 */
+    color: white;
+    /* 文本颜色 */
+    line-height: 20px;
+    /* 行高与进度条高度相同，使文字垂直居中 */
+    padding-right: 5px;
+    /* 文本与进度条右边界的距离 */
 }
-
 </style>
