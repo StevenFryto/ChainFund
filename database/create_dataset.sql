@@ -13,7 +13,7 @@ CREATE TABLE user (
 -- 创建众筹项目表
 CREATE TABLE project (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id, INT NOT NULL,
+    user_id INT NOT NULL,
     surety_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -36,7 +36,7 @@ CREATE TABLE surety (
     name VARCHAR(100) NOT NULL,
     id_card VARCHAR(20) NOT NULL,
     phone VARCHAR(20) NOT NULL,
-    photo VARCHAR(255) NOT NULL,
+    photo VARCHAR(255) NOT NULL
 );
 
 -- 创建浏览记录表
@@ -44,5 +44,6 @@ CREATE TABLE record (
     user_id INT,
     project_id INT,
     duration DATETIME,
-    raised_amount DECIMAL(10, 2)
+    raised_amount DECIMAL(10, 2),
+    message varchar(255)
 );

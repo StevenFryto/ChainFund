@@ -71,7 +71,7 @@ export default {
             raisedProjects: [],
         };
     },
-    created() {
+    mounted() {
         this.fetchPublishedProjects();
         this.fetchRaisedProjects();
     },

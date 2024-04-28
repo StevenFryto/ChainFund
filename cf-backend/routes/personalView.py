@@ -56,7 +56,7 @@ def getHistory():
                 ON 
                     r.project_id = p.id
                 WHERE 
-                    r.user_id = %s
+                    r.user_id = %s AND r.raised_amount = 0
                 ORDER BY 
                     r.duration DESC
             """
@@ -78,27 +78,31 @@ def getHistory():
 
 @personalView_bp.route("/deleteHistory", methods=["DELETE"])
 def deleteHistory():
-    record_id = request.args.get('id')  # 确保从请求中获取 ID
+    user_id = request.args.get("userId")  # 从请求参数中获取 userId
+    project_id = request.args.get("projectId")  # 从请求参数中获取 projectId
 
-    if not record_id:
-        return jsonify({"error": "缺少记录 ID"}), 400  # 参数无效
+    # 确保所有必需的参数都被提供
+    if not user_id or not project_id:
+        return jsonify({"error": "缺少 userId 或 projectId"}), 400
 
-    connection = create_connection()  # 每个请求创建新的连接
+    connection = create_connection()  # 为每个请求创建新的数据库连接
     try:
         with connection.cursor() as cursor:
-            delete_sql = "DELETE FROM record WHERE project_id = %s"
-            cursor.execute(delete_sql, (record_id,))
+            # 根据 userId 和 projectId 删除记录
+            delete_sql = "DELETE FROM record WHERE user_id = %s AND project_id = %s AND raised_amount = 0"
+            cursor.execute(delete_sql, (user_id, project_id))
             connection.commit()  # 提交事务
 
+            # 检查删除操作的结果
             if cursor.rowcount == 0:
-                return jsonify({"error": "记录未找到"}), 404  # 如果没有删除任何记录
+                return jsonify({"error": "记录未找到"}), 404  # 如果没有记录被删除
 
             return jsonify({"message": "记录已删除"}), 200
     except pymysql.MySQLError as e:
-        # 捕获数据库错误，并提供更多信息
-        return jsonify({"error": str(e)}), 500
+        # 捕获数据库相关错误
+        return jsonify({"error": f"数据库错误: {e}"}), 500
     except Exception as e:
-        # 捕获一般异常
-        return jsonify({"error": str(e)}), 500
+        # 捕获其他异常
+        return jsonify({"error": f"服务器错误: {e}"}), 500
     finally:
-        connection.close()  # 确保连接被关闭
+        connection.close()  # 确保在离开前关闭数据库连接
