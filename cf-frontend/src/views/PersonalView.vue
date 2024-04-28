@@ -5,8 +5,9 @@
             <img class="avatar" :src="user.avatarUrl" alt="用户头像" />
             <div class="user-details">
                 <h1 class="user-name">{{ user.name }}</h1>
-                <p class="user-id"><b>身份证号：</b>{{ user.id }}</p>
-                <p class="user-phone"><b>电话号码：</b>{{ user.phone }}</p>
+                <!-- <p class="user-id"><b>身份证号：</b>{{ user.id }}</p>
+                <p class="user-phone"><b>电话号码：</b>{{ user.phone }}</p> -->
+                <p class="user-email"><b>邮箱：</b>{{ user.email }}</p>
             </div>
         </div>
 
@@ -30,31 +31,67 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
     name: 'PersonalView',
     methods: {
         deleteRecord(id) {
+            const recordId = id;
             this.history = this.history.filter(record => record.id !== id);
+            // 向后端发送删除请求
+            axios.delete(`http://localhost:5000/deleteHistory?id=${recordId}`)
+                .then(response => {
+                    console.log("成功删除:", response.data.message);
+                })
+                .catch(error => {
+                    if (error.response) {
+                        console.error("删除失败:", error.response.data.error);  // 显示详细错误信息
+                    } else {
+                        console.error("网络错误或其他问题");  // 网络问题或其他未处理的错误
+                    }
+                });
+
         },
         viewRecord(recordId) {
             // 跳转到指定的 /project/:id 页面
             this.$router.push({ name: 'ProjectDetails', params: { id: recordId } });
-        }
+        },
+        async fetchPersonalInfo() {
+            const currentUserId = this.$route.params.userId;
+            try {
+                const response = await axios.get(`http://localhost:5000/getPersonalInfo?id=${currentUserId}`);
+                this.user = response.data;
+                this.user.avatarUrl = require(`@/assets/avatars/${this.user.avatar}`)
+            } catch (error) {
+                console.error('获取用户信息失败', error);
+            }
+        },
+        async fetchHistory() {
+          const currentUserId = this.$route.params.userId;
+          try {
+              const response = await axios.get(`http://localhost:5000/getHistory?id=${currentUserId}`);
+              this.history = response.data.history;
+          } catch (error) {
+              console.error('获取浏览记录失败', error);
+          }
+        },
     },
     data() {
         return {
             user: {
-                name: '张三',
-                id: '12345678901234',
-                phone: '12345678901',
-                avatarUrl: 'https://th.bing.com/th/id/R.57384e4c2dd256a755578f00845e60af?rik=uy9%2bvT4%2b7Rur%2fA&riu=http%3a%2f%2fimg06file.tooopen.com%2fimages%2f20171224%2ftooopen_sy_231021357463.jpg&ehk=whpCWn%2byPBvtGi1%2boY1sEBq%2frEUaP6w2N5bnBQsLWdo%3d&risl=&pid=ImgRaw&r=0'
+                name: '',
+                // id: '',
+                // phone: '',
+                email: '',
+                avatarUrl: ''
             },
-            history: [
-                { id: 1, title: '123456789', watchedAt: '13:25' },
-                { id: 2, title: 'abcdefghij', watchedAt: '13:22' },
-                { id: 3, title: 'klmnopqrst', watchedAt: '13:20' },
-            ]
+            history: []
         };
+    },
+    mounted() {
+      this.fetchPersonalInfo();
+      this.fetchHistory();
     }
 }
 </script>
@@ -98,7 +135,8 @@ export default {
 }
 
 .user-id,
-.user-phone {
+.user-phone,
+.user-email {
     font-size: 16px;
     color: #666;
 }
