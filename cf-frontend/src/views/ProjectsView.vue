@@ -136,6 +136,19 @@ export default {
             return `${value_1.toFixed(0)}`
         },
         navigateToProject(projectId) {
+            const visitData = {
+                user_id: this.$route.params.userId,
+                project_id: projectId,
+                raised_amount: 0,
+                message: 'visit',
+            };
+
+            axios.post('http://127.0.0.1:5000/donate', visitData)
+                .then()
+                .catch(error => {
+                    console.error('访问记录保存失败:', error);
+                });
+            
             this.$router.push({ path: `/${this.$route.params.userId}/project/${projectId}` });
         }
     },

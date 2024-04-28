@@ -14,6 +14,7 @@ connection = pymysql.connect(**DB_CONFIG)
 
 @getProjectDetails_bp.route("/getProjectDetails/<int:id>", methods=["GET"])
 def fetch_project(id):
+    connection = pymysql.connect(**DB_CONFIG)
     try:
         with connection.cursor() as cursor:
             # 执行SQL查询获取项目信息
@@ -55,6 +56,6 @@ def fetch_project(id):
             else:
                 return jsonify({"message": "项目未找到"}), 404
     finally:
-        # connection.close()
-        pass
+        connection.close()
+        # pass
 

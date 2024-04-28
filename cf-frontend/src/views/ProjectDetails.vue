@@ -1,6 +1,6 @@
 <template>
     <div class="project-details" v-if="project">
-        <el-card class="detail-card">
+        <el-card class="detail-card" v-show="showDetailCard">
             <div class="title">{{ project.title }}</div>
             <div class="time-cards">
                 <el-card class="time-card" shadow="hover">发布时间：{{ project.create_time }}</el-card>
@@ -36,7 +36,10 @@
                     class="project-image" />
             </div>
             <div class="project-description">{{ project.description }}</div>
-            <button @click="donate()">进行捐款</button>
+            
+            <!-- 捐款按钮 -->
+            <button @click="openDonationDialog">进行捐款</button>
+
             <div class="tags">
                 <el-card v-for="(tag, index) in project.label" :key="index" class="tag"
                     :style="{ backgroundColor: colors[index % colors.length] }" shadow="hover">
@@ -44,25 +47,50 @@
                 </el-card>
             </div>
         </el-card>
+
+        <div>
+            <el-dialog
+            title="进行捐款"
+            v-model="donationDialogVisible"
+            @close="resetDonationDialog"
+            >
+            <div class="donation-inputs">
+                <el-input v-model="donationAmount" :min="1" :max="10000" placeholder="输入捐款金额"></el-input>
+                <el-input v-model="donationMessage" placeholder="您的留言（可选）"></el-input>
+            </div>
+                <template #footer>
+                    <el-button @click="donationDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="confirmDonation">确认捐款</el-button>
+                </template>
+            </el-dialog>
+        </div>
     </div>
 </template>
 
+
 <script>
-import { ElCard } from 'element-plus';
+import { ElCard, ElDialog, ElButton, ElInput} from 'element-plus';
 import axios from 'axios';
+
 export default {
-    components: {
-        //ElRow,
-        //ElCol,
-        ElCard
-    },
-    data() {
-        return {
-            project: null,
-            showDetails: false,
-            colors: ['#FF6347', '#4682B4', '#32CD32', '#FFD700', '#6A5ACD', '#FF4500', '#20B2AA'], // 七种不同的颜色
-        };
-    },
+  components: {
+    ElCard,
+    ElDialog,
+    ElButton,
+    ElInput,
+  },
+  data() {
+    return {
+      project: null,
+      showDetailCard: true,
+      showDetails: false,
+      donationDialogVisible: false, // 控制弹出框的显示与否
+      donationAmount: 10, // 默认的捐款金额
+      donationMessage: '', // 捐赠者留言
+      timeoutId: null,
+      colors: ['#FF6347', '#4682B4', '#32CD32', '#FFD700', '#6A5ACD', '#FF4500', '#20B2AA'], // 七种不同的颜色
+    };
+  },
     methods: {
         fetchProject(id) {
             const baseUrl = 'http://127.0.0.1:5000/getProjectDetails'; // 根据实际后端服务地址调整
@@ -118,9 +146,48 @@ export default {
         percentage(goal, raised) {
             return (raised / goal) * 100;
         },
-        donate() {
-            // Donation logic
+
+        openDonationDialog() {
+            this.showDetailCard = false; // 隐藏detail-card
+            this.donationDialogVisible = true; // 打开捐款弹出框
         },
+        resetDonationDialog() {
+            this.donationAmount = 10; // 重置默认捐款金额
+            this.donationMessage = ''; // 重置留言
+            this.showDetailCard = true;
+            this.donationDialogVisible = false;
+        },
+        confirmDonation() {
+            // 执行捐款逻辑
+            const donationData = {
+                user_id: this.$route.params.userId,
+                project_id: this.project.id,
+                raised_amount: this.donationAmount,
+                message: this.donationMessage,
+            };
+
+            axios.post('http://127.0.0.1:5000/donate', donationData) // 发送捐款请求
+                .then((response) => {
+                    console.log('捐款成功:', response.data);
+
+                    // 弹出确认框
+                    const userConfirmed = window.confirm('捐款成功！感谢您的善心！');
+
+                    if (userConfirmed) {
+                        // 如果用户确认，执行后续操作
+                        const projectId = this.$route.params.id;
+                        this.project = this.fetchProject(projectId);
+                        this.showDetailCard = true; // 捐款后再次显示detail-card
+                        this.donationDialogVisible = false; // 关闭弹出框
+                    } else {
+                        console.log('用户取消了操作。');
+                    }
+                })
+                .catch((error) => {
+                    console.error('捐款失败:', error);
+                });
+        },
+
         handleMouseLeave() {
             // 设置延时
             this.timeoutId = setTimeout(() => {
@@ -149,6 +216,7 @@ export default {
 }
 
 .project-details {
+    position: relative; /* 添加相对定位 */
     display: flex;
     justify-content: center;
     padding: 20px;
@@ -316,5 +384,34 @@ button {
     font-size: larger;
     font-weight: bolder;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.el-dialog {
+    /* display: flex; */
+    justify-content: center;
+    /* display: flex;
+    position: fixed; 改为fixed定位 */
+    /* top: 50%; 居中显示 */
+    /* left: 50%; */
+    /* transform: translate(-50%, -50%); 同时垂直和水平居中 */
+    /* 确保弹出框宽度适应内容或不超过屏幕宽度 */
+    /* 添加阴影和圆角以提升美观 */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.el-dialog__title {
+  font-size: 120px; /* 调整标题的字体大小 */
+  font-weight: bold; /* 设置标题的字体粗细 */
+  color: #3498db; /* 设置标题的颜色 */
+  text-align: center; /* 标题居中 */
+  padding: 10px; /* 增加标题的内边距 */
+  background-color: #f5f5f5 !important; /* 设置标题背景色 */
+}
+
+/* 输入框样式 */
+.el-input {
+  margin: 10px 0; /* 添加上下边距 */
+  border-radius: 5px; /* 轻微圆角 */
 }
 </style>

@@ -16,7 +16,7 @@
             <h2>浏览记录</h2>
 
             <div class="history-list">
-                <div v-for="record in history" :key="record.id" class="history-section" @click="viewRecord(record.id)">
+                <div v-for="record in history" :key="record.projectId" class="history-section" @click="viewRecord(record.projectId)">
                     <div class="history-content">
                         <h3 class="history-title">{{ record.title }}</h3>
                         <p class="history-meta">观看时间: {{ record.watchedAt }}</p>
@@ -36,13 +36,18 @@ import axios from 'axios';
 export default {
     name: 'PersonalView',
     methods: {
-        deleteRecord(id) {
-            const recordId = id;
-            this.history = this.history.filter(record => record.id !== id);
+        deleteRecord(projectId) {
+            // this.history = this.history.filter(record => record.projectId !== projectId);
             // 向后端发送删除请求
-            axios.delete(`http://localhost:5000/deleteHistory?id=${recordId}`)
+            axios.delete(`http://localhost:5000/deleteHistory`, {
+                params: {
+                    userId: this.$route.params.userId,
+                    projectId: projectId,
+                }
+            })
                 .then(response => {
                     console.log("成功删除:", response.data.message);
+                    this.fetchHistory();
                 })
                 .catch(error => {
                     if (error.response) {
@@ -51,7 +56,6 @@ export default {
                         console.error("网络错误或其他问题");  // 网络问题或其他未处理的错误
                     }
                 });
-
         },
         viewRecord(recordId) {
             // 跳转到指定的 /project/:id 页面
