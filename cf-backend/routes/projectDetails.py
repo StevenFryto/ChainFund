@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, Blueprint
-from flask_cors import CORS
 import pymysql
 from datetime import datetime
 

@@ -1,5 +1,4 @@
-from flask import Flask, jsonify, Blueprint
-from flask_cors import CORS
+from flask import Flask, jsonify, Blueprint, request
 import pymysql
 import json
 
@@ -35,5 +34,20 @@ def get_projects():
     return jsonify(projects)
 
 
-# if __name__ == "__main__":
-#     app.run(debug=True, port=5050)
+@getProjects_bp.route("/record", methods=["POST"])
+def record():
+    data = request.get_json()
+    user_id = data.get('userId')
+    project_id = data.get('projectId')
+    try:
+        with connection.cursor() as cursor:
+            # 执行SQL查询
+            sql = "INSERT INTO record(user_id, project_id, raised_amount) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (user_id, project_id, 0))
+        connection.commit()
+    except Exception as e:
+        print('Error inserting record', e)
+        connection.rollback()
+        return jsonify({'status': 'error'})
+
+    return jsonify({'status': 'success'})

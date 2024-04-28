@@ -81,7 +81,7 @@ nav {
 
     a {
         font-weight: bold;
-        font-size: larger;
+        font-size: 20px;
         color: #2c3e50;
         text-align: center;
         text-decoration: none;

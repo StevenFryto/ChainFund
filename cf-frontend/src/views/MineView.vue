@@ -33,7 +33,7 @@
             <div class="title">🟢 <b>您参与的项目</b></div>
             <div v-if="raisedProjects.length == 0" class="no-project">未查询到数据，点击👉项目广场👈看看吧！</div>
             <div v-for="(project, index) in raisedProjects" :key="index" class="project"
-                :style="{ backgroundColor: project.current_amount >= project.target_amount ? '#FFC0CB' : '#7ad2ba' }">
+                :style="{ backgroundColor: project.current_amount < project.target_amount ? '#FFC0CB' : '#7ad2ba' }">
                 <div class="project-left">
                     <img :src="project.photos" alt="Project Image" class="project-image">
                 </div>
@@ -200,6 +200,7 @@ export default {
     margin-bottom: 5px;
     border-radius: 5px;
     font-size: small;
+    color: white;
 
     box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.2);
 }

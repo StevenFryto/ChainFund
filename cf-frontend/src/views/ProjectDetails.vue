@@ -1,60 +1,67 @@
 <template>
-    <div class="project-details" v-if="project">
-        <el-card class="detail-card">
-            <div class="title">{{ project.title }}</div>
-            <div class="time-cards">
-                <el-card class="time-card" shadow="hover">发布时间：{{ project.create_time }}</el-card>
-                <el-card class="time-card" shadow="hover">截止时间：{{ project.deadline }}</el-card>
-            </div>
-            <div class="funding-cards">
-                <el-card class="money-card" shadow="hover">
-                    <p>目标金额: {{ formatCurrency(project.target_amount) }} &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 已筹得金额: {{
-                        formatCurrency(project.current_amount) }}</p>
-                </el-card>
-            </div>
-            <el-card class="owner-card" @mouseover="handleMouseEnter" @mouseleave="handleMouseLeave">
-                <template v-if="showDetails">
-                    <div class="owner-details">
-                        <div>
-                            <p><b>担保人信息</b></p>
-                            <p>姓名：{{ project.surety_info.name }}</p>
-                            <p>身份证号：{{ project.surety_info.id_card }}</p>
-                            <p>联系方式：{{ project.surety_info.phone }}</p>
+    <div>
+        <div class="project-details" v-if="project">
+            <el-card class="detail-card">
+                <div class="title">{{ project.title }}</div>
+                <div class="time-cards">
+                    <el-card class="time-card" shadow="hover">发布时间：{{ project.create_time }}</el-card>
+                    <el-card class="time-card" shadow="hover">截止时间：{{ project.deadline }}</el-card>
+                </div>
+                <div class="funding-cards">
+                    <el-card class="money-card" shadow="hover">
+                        <p>目标金额: {{ formatCurrency(project.target_amount) }} &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 已筹得金额: {{
+                            formatCurrency(project.current_amount) }}</p>
+                    </el-card>
+                </div>
+                <el-card class="owner-card" @mouseover="handleMouseEnter" @mouseleave="handleMouseLeave">
+                    <template v-if="showDetails">
+                        <div class="owner-details">
+                            <div>
+                                <p><b>担保人信息</b></p>
+                                <p>姓名：{{ project.surety_info.name }}</p>
+                                <p>身份证号：{{ project.surety_info.id_card }}</p>
+                                <p>联系方式：{{ project.surety_info.phone }}</p>
+                            </div>
                         </div>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class="patient-info">
-                        {{ project.patient_name }} ({{ project.patient_gender }}, {{ project.patient_birth }} 岁)
-                        &nbsp;&nbsp;&nbsp; {{ project.patient_occupation
-                        }}
-                    </div>
-                </template>
-            </el-card>
-            <div class="project-images">
-                <img v-for="(img, index) in project.photos" :key="index" :src="img.src" alt="Project Image"
-                    class="project-image" />
-            </div>
-            <div class="project-description">{{ project.description }}</div>
-            <button @click="donate()">进行捐款</button>
-            <div class="tags">
-                <el-card v-for="(tag, index) in project.label" :key="index" class="tag"
-                    :style="{ backgroundColor: colors[index % colors.length] }" shadow="hover">
-                    #&nbsp;{{ tag }}
+                    </template>
+                    <template v-else>
+                        <div class="patient-info">
+                            {{ project.patient_name }} ({{ project.patient_gender }}, {{ project.patient_birth }} 岁)
+                            &nbsp;&nbsp;&nbsp; {{ project.patient_occupation
+                            }}
+                        </div>
+                    </template>
                 </el-card>
-            </div>
-        </el-card>
+                <div class="project-images">
+                    <img v-for="(img, index) in project.photos" :key="index" :src="img.src" alt="Project Image"
+                        class="project-image" />
+                </div>
+                <div class="project-description">{{ project.description }}</div>
+                <button @click="donate()">进行捐款</button>
+                <div class="tags">
+                    <el-card v-for="(tag, index) in project.label" :key="index" class="tag"
+                        :style="{ backgroundColor: colors[index % colors.length] }" shadow="hover">
+                        #&nbsp;{{ tag }}
+                    </el-card>
+                </div>
+            </el-card>
+        </div>
+        <div class="project-details" v-if="project">
+            <ProjectFlow></ProjectFlow>
+        </div>
     </div>
 </template>
 
 <script>
 import { ElCard } from 'element-plus';
 import axios from 'axios';
+import ProjectFlow from '@/components/ProjectFlow.vue';
+
 export default {
     components: {
         //ElRow,
         //ElCol,
-        ElCard
+        ElCard, ProjectFlow
     },
     data() {
         return {

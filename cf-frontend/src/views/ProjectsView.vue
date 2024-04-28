@@ -1,49 +1,52 @@
 <template>
-    <div class="search-bar-container">
-        <input type="text" v-model="searchQuery" @input="fetchSearchResults" placeholder="搜索相关项目" class="search-bar" />
-        <button @click="fetchSearchResults" class="search-button">搜索</button>
-    </div>
-
-    <div class="dropdown-menu" v-if="searchResults.length">
-        <div v-for="result in searchResults" :key="result.id" @click="navigateToProject(result.id)"
-            class="dropdown-item">
-            {{ result.title }}
+    <div>
+        <div class="search-bar-container">
+            <input type="text" v-model="searchQuery" @input="fetchSearchResults" placeholder="搜索相关项目" class="search-bar" />
+            <button @click="fetchSearchResults" class="search-button">搜索</button>
         </div>
-    </div>
-    <div class="projects" v-if="projects">
-        <div class="project-container">
-            <div class="project-card" shadow="always" v-for="project in projects" :key="project.id"
-                @click="navigateToProject(project.id)">
-                <el-card class="card-content">
-                    <div class="clearfix">{{ project.title }}</div>
-                    <img :src="project.image" class="project-image" />
-                    <!--<el-progress class="progress" type="line" color="green"
-                        :percentage="percentage(project.target_amount, project.current_amount)" :stroke-width="5"
-                        :text-inside="true" status="success" />-->
-                    <div class="progress-container">
-                        <div class="progress-bar"
-                            :style="{ width: percentage(project.target_amount, project.current_amount) + '%' }"></div>
-                    </div>
-                    <div>
-                        <div class="project-funds-title">
-                            <div class="fund-target_amount-title">目标金额</div>
-                            <div class="fund-target_amount-title">已筹得金额</div>
+
+        <div class="dropdown-menu" v-if="searchResults.length">
+            <div v-for="result in searchResults" :key="result.id" @click="navigateToProject(result.id)"
+                class="dropdown-item">
+                {{ result.title }}
+            </div>
+        </div>
+        <div class="projects" v-if="projects">
+            <div class="project-container">
+                <div class="project-card" shadow="always" v-for="project in projects" :key="project.id"
+                    @click="navigateToProject(project.id)">
+                    <el-card class="card-content">
+                        <div class="clearfix">{{ project.title }}</div>
+                        <img :src="project.image" class="project-image" />
+                        <!--<el-progress class="progress" type="line" color="green"
+                            :percentage="percentage(project.target_amount, project.current_amount)" :stroke-width="5"
+                            :text-inside="true" status="success" />-->
+                        <div class="progress-container">
+                            <div class="progress-bar"
+                                :style="{ width: percentage(project.target_amount, project.current_amount) + '%' }"></div>
                         </div>
-                        <div class="project-funds">
-                            <div class="fund-target_amount">{{ formatCurrency(project.target_amount) }}</div>
-                            <div class="fund-current_amount">{{ formatCurrency(project.current_amount) }}</div>
+                        <div>
+                            <div class="project-funds-title">
+                                <div class="fund-target_amount-title">目标金额</div>
+                                <div class="fund-target_amount-title">已筹得金额</div>
+                            </div>
+                            <div class="project-funds">
+                                <div class="fund-target_amount">{{ formatCurrency(project.target_amount) }}</div>
+                                <div class="fund-current_amount">{{ formatCurrency(project.current_amount) }}</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="label-container">
-                        <el-card v-for="(tag, index) in project.label" :key="index" class="tag"
-                            :style="{ backgroundColor: colors[(index + project.id) % colors.length] }">
-                            # {{ tag }}
-                        </el-card>
-                    </div>
-                </el-card>
+                        <div class="label-container">
+                            <el-card v-for="(tag, index) in project.label" :key="index" class="tag"
+                                :style="{ backgroundColor: colors[(index + project.id) % colors.length] }">
+                                # {{ tag }}
+                            </el-card>
+                        </div>
+                    </el-card>
+                </div>
             </div>
         </div>
     </div>
+    
 </template>
 
 <script>
@@ -136,6 +139,13 @@ export default {
             return `${value_1.toFixed(0)}`
         },
         navigateToProject(projectId) {
+            axios.post('http://localhost:5000/record', {
+                userId: this.$route.params.userId,
+                projectId: projectId
+            })
+                .catch(error => {
+                    console.error('日志记录失败，请查看后端', error);
+                });
             this.$router.push({ path: `/${this.$route.params.userId}/project/${projectId}` });
         }
     },
@@ -153,7 +163,7 @@ export default {
 }
 
 .search-bar {
-    width: 30%;
+    width: 40%;
     padding-left: 20px;
     border: none;
     border-radius: 20px;
