@@ -2,8 +2,11 @@ from flask import Flask, jsonify, Blueprint
 import pymysql
 from datetime import datetime
 
-from config.config import DB_CONFIG
+import sys
+sys.path.append("d:\\CyberSecurity\\me\\JiShe\\4.0\\ChainFund")
+from blockchain import chainfund
 
+from config.config import DB_CONFIG
 
 # 创建Blueprint
 getProjectDetails_bp = Blueprint("getProjectDetails", __name__)
@@ -58,3 +61,28 @@ def fetch_project(id):
         connection.close()
         # pass
 
+
+@getProjectDetails_bp.route("/getMessage/<int:id>", methods=["GET"])
+def message_way(id):
+    records = chainfund.getRecordsByProjectId(args=[id])
+    print(records[0][0][5])
+    results = []
+
+    connection = pymysql.connect(**DB_CONFIG)
+    try:
+        with connection.cursor() as cursor:
+            for record in records[0]:
+                # 执行SQL查询获取项目信息
+                user_id = record[0]
+                message = record[5]
+                select_sql = "SELECT username FROM user WHERE id = %s"
+                cursor.execute(select_sql, (user_id))
+                username = cursor.fetchone()['username']
+
+                results.append({'username' : username, 'message' : message})
+    except Exception as e:
+        print('Error fetching projects:', e)
+        return jsonify({'error': str(e)}), 500
+
+
+    return jsonify({'status' : 'success' , 'results' : results})

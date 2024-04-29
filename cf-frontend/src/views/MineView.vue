@@ -121,6 +121,7 @@ export default {
 <style scoped>
 .no-project {
     font-size: large;
+    margin-bottom: 40px;
 }
 
 .related-projects {

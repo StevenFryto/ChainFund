@@ -57,7 +57,11 @@ def publish_project():
 def insert_project(user_id, surety_id, title, description, patient_name, patient_id_card, patient_gender, patient_birth, patient_occupation, photos, label, deadline, target_amount):
     try:
         with connection.cursor() as cursor:
-            sql = "INSERT INTO project (user_id, surety_id, title, description, patient_name, patient_id_card, patient_gender, patient_birth, patient_occupation, photos, label, deadline, target_amount, current_amount) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            sql = """
+                INSERT INTO project 
+                (user_id, surety_id, title, description, patient_name, patient_id_card, patient_gender, patient_birth, patient_occupation, photos, label, deadline, target_amount, current_amount) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
             cursor.execute(sql, (user_id, surety_id, title, description, patient_name, patient_id_card, patient_gender, patient_birth, patient_occupation, photos, label, deadline, target_amount, 0))
         connection.commit()
         return cursor.lastrowid

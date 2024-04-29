@@ -94,7 +94,7 @@ export default {
             searchQuery: '',
             searchResults: [],
             projects: null,
-            colors: ['#FF6347', '#4682B4', '#32CD32', '#FFD700', '#6A5ACD', '#FF4500', '#20B2AA'],
+            colors: ['#FF6347', '#4682B4', '#32CD32', '#FFD755', '#6A5ACD', '#FF4500', '#20B2AA'],
         };
     },
 

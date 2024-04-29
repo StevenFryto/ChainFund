@@ -21,4 +21,5 @@ def search():
             result = cursor.fetchall()
             return jsonify(result)
     finally:
-        connection.close()
+        # connection.close()
+        pass

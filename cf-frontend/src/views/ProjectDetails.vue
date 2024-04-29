@@ -100,9 +100,15 @@
 
             </div>
         </div>
-        <div class="project-details" v-if="project">
-            <!-- <ProjectFlow></ProjectFlow> -->
-            <div class="message-wall"><MessageWall></MessageWall></div>
+        <div class="component" v-if="project">
+            <div class="bubble-wall">
+                <div class="bubble-title"><b>🧱 捐款者泡泡墙</b></div>
+                <BubbleWall></BubbleWall>
+            </div>
+            <div class="message-wall">
+                <div class="message-title"><b>🧱 捐款者留言墙</b></div>
+                <MessageWall></MessageWall>
+            </div>
         </div>
     </div>
 </template>
@@ -113,12 +119,14 @@ import { ElCard, ElDialog, ElButton, ElInput, ElForm, ElFormItem } from 'element
 import axios from 'axios';
 // import ProjectFlow from '@/components/ProjectFlow.vue';
 import MessageWall from '@/components/MessageWall.vue';
+import BubbleWall from '@/components/BubbleWall.vue';
 
 export default {
     components: {
         ElCard, ElDialog, ElButton, ElInput, ElForm, ElFormItem,
         // ProjectFlow, 
-        MessageWall
+        MessageWall,
+        BubbleWall
     },
     data() {
         return {
@@ -220,7 +228,6 @@ export default {
                 raised_amount: parseInt(this.donationAmount),
                 message: this.donationMessage,
             };
-
             axios.post('http://127.0.0.1:5000/donate', donationData) // 发送捐款请求
                 .then((response) => {
                     // alert(`捐款成功，您的区块哈希为：\n ${response.data.blockHash}`);
@@ -466,11 +473,54 @@ button {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.message-wall {
-    width: 80%;
+.component {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.bubble-wall {
+    width: 30%;
+    height: 500px;
+    margin-left: 10%;
     border-radius: 25px;
     background-color: white;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.message-wall {
+    width: 49%;
+    height: 500px;
+    margin-right: 10%;
+    border-radius: 25px;
+    background-color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.bubble-title {
+    font-size: 20px;
+    text-align: center;
+    margin-top: 20px;
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #000;
+}
+
+.message-title {
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #000;
 }
 
 .el-dialog {
