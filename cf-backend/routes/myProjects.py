@@ -41,6 +41,7 @@ def execute_sql(sql, params=None):
             result = cursor.fetchall()
     finally:
         lock.release()
+        connection.close()
     return result
 
 

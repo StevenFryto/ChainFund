@@ -21,7 +21,9 @@ contract_abi = abi_parser.contract_abi
 # 插入资金流动记录
 def insertRecord(args : list):
     result = client.sendRawTransactionGetReceipt(to_address, contract_abi, fn_name="insertRecord", args=args)
-    return result['blockHash']
+    print(result)
+    # return result['blockHash']
+    return result
 
 
 # 通过获取 <捐钱者id> 资金流动记录

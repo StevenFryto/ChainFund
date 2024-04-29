@@ -3,6 +3,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+import Elementplus from 'element-plus'
+import 'element-plus/dist/index.css'
+
 const app =  createApp(App)
 
 // // 初始化 currentUserId
@@ -17,4 +20,6 @@ const app =  createApp(App)
 // })
 
 
-app.use(store).use(router).mount('#app')
+app.use(store).use(router)
+app.use(Elementplus)
+app.mount('#app')

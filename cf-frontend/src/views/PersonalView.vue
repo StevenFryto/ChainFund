@@ -21,7 +21,7 @@
                 <button @click="fetchSearchResults" class="search-button">正则匹配</button>
             </div>
             <div class="history-list">
-                <div v-for="record in history" :key="record.id" class="history-section" @click="viewRecord(record.id)">
+                <div v-for="record in history" :key="record.project_id" class="history-section" @click="viewRecord(record.project_id)">
                     <div class="history-content">
                         <div class="history-title">{{ record.title }}</div>
                         <div class="history-meta">观看时间: {{ record.watchedAt }}</div>
@@ -42,13 +42,18 @@ import axios from 'axios';
 export default {
     name: 'PersonalView',
     methods: {
-        deleteRecord(id) {
-            const recordId = id;
-            this.history = this.history.filter(record => record.id !== id);
+        deleteRecord(projectId) {
+            // this.history = this.history.filter(record => record.projectId !== projectId);
             // 向后端发送删除请求
-            axios.delete(`http://localhost:5000/deleteHistory?id=${recordId}`)
+            axios.delete(`http://localhost:5000/deleteHistory`, {
+                params: {
+                    userId: this.$route.params.userId,
+                    projectId: projectId,
+                }
+            })
                 .then(response => {
                     console.log("成功删除:", response.data.message);
+                    this.fetchHistory();
                 })
                 .catch(error => {
                     if (error.response) {
@@ -57,11 +62,11 @@ export default {
                         console.error("网络错误或其他问题");  // 网络问题或其他未处理的错误
                     }
                 });
-
         },
         viewRecord(recordId) {
             // 跳转到指定的 /project/:id 页面
-            this.$router.push({ name: 'ProjectDetails', params: { id: recordId } });
+            // this.$router.push({ name: 'ProjectDetails', params: { id: recordId } });
+            this.$router.push(`/${this.$route.params.userId}/project/${recordId}`);
         },
         async fetchPersonalInfo() {
             const currentUserId = this.$route.params.userId;
@@ -78,6 +83,7 @@ export default {
             try {
                 const response = await axios.get(`http://localhost:5000/getHistory?id=${currentUserId}`);
                 this.history = response.data.history;
+                console.log(this.history);
             } catch (error) {
                 console.error('获取浏览记录失败', error);
             }
@@ -132,6 +138,7 @@ export default {
     width: 200px;
     height: 200px;
     border-radius: 50%;
+    object-fit: cover;
 }
 
 .user-details {

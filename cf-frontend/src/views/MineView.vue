@@ -71,7 +71,7 @@ export default {
             raisedProjects: [],
         };
     },
-    created() {
+    mounted() {
         this.fetchPublishedProjects();
         this.fetchRaisedProjects();
     },
@@ -120,7 +120,7 @@ export default {
 
 <style scoped>
 .no-project {
-    font-size: x-large;
+    font-size: large;
 }
 
 .related-projects {

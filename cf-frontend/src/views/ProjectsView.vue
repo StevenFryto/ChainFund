@@ -139,6 +139,19 @@ export default {
             return `${value_1.toFixed(0)}`
         },
         navigateToProject(projectId) {
+            const visitData = {
+                user_id: this.$route.params.userId,
+                project_id: projectId,
+                raised_amount: 0,
+                message: 'visit',
+            };
+
+            axios.post('http://127.0.0.1:5000/donate', visitData)
+                .then()
+                .catch(error => {
+                    console.error('访问记录保存失败:', error);
+                });
+            
             axios.post('http://localhost:5000/record', {
                 userId: this.$route.params.userId,
                 projectId: projectId
@@ -322,6 +335,9 @@ export default {
 }
 
 .tag {
+    /* height: 20px;
+    width: 40px; */
+
     margin-left: 2px;
     /* 小间距使得标签不紧挨 */
     padding: 3px 8px;

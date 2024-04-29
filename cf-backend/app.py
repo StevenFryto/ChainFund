@@ -6,6 +6,8 @@ from routes.loginAndRegister import login_bp
 from routes.publishProject import publishProject_bp
 from routes.search import search_bp
 from routes.personalView import personalView_bp
+from routes.donate import donate_bp
+from routes.record import record_bp
 
 
 from flask_cors import CORS
@@ -21,6 +23,8 @@ app.register_blueprint(getProjectDetails_bp)
 app.register_blueprint(publishProject_bp)
 app.register_blueprint(search_bp)
 app.register_blueprint(personalView_bp)
+app.register_blueprint(donate_bp)
+app.register_blueprint(record_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)
