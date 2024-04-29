@@ -1,7 +1,12 @@
 <template>
     <div>
         <div class="search-bar-container">
-            <input type="text" v-model="searchQuery" @input="fetchSearchResults" placeholder="搜索相关项目" class="search-bar" />
+            <button @click="showAllProjects" v-bind:class="{ active: isAllProjectsSelected }"
+                class="project-toggle-button">所有项目</button>
+            <button @click="showRecommendedProjects" v-bind:class="{ active: isRecommendedSelected }"
+                class="project-toggle-button">推荐项目</button>
+            <input type="text" v-model="searchQuery" @input="fetchSearchResults" placeholder="搜索相关项目"
+                class="search-bar" />
             <button @click="fetchSearchResults" class="search-button">搜索</button>
         </div>
 
@@ -15,7 +20,7 @@
             <div class="project-container">
                 <div class="project-card" shadow="always" v-for="project in projects" :key="project.id"
                     @click="navigateToProject(project.id)">
-                    <el-card class="card-content">
+                    <div class="card-content">
                         <div class="clearfix">{{ project.title }}</div>
                         <img :src="project.image" class="project-image" />
                         <!--<el-progress class="progress" type="line" color="green"
@@ -23,7 +28,8 @@
                             :text-inside="true" status="success" />-->
                         <div class="progress-container">
                             <div class="progress-bar"
-                                :style="{ width: percentage(project.target_amount, project.current_amount) + '%' }"></div>
+                                :style="{ width: percentage(project.target_amount, project.current_amount) + '%' }">
+                            </div>
                         </div>
                         <div>
                             <div class="project-funds-title">
@@ -35,24 +41,24 @@
                                 <div class="fund-current_amount">{{ formatCurrency(project.current_amount) }}</div>
                             </div>
                         </div>
-                        <div class="label-container">
-                            <el-card v-for="(tag, index) in project.label" :key="index" class="tag"
-                                :style="{ backgroundColor: colors[(index + project.id) % colors.length] }">
-                                # {{ tag }}
-                            </el-card>
+                    </div>
+                    <div class="label-container">
+                        <div v-for="(tag, index) in project.label" :key="index" class="tag"
+                            :style="{ backgroundColor: colors[(index + project.id) % colors.length] }">
+                            # {{ tag }}
                         </div>
-                    </el-card>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
 </template>
 
 <script>
 // import { ElRow, ElCol, ElCard, ElProgress } from 'element-plus';
 // import { ElCard, ElProgress } from 'element-plus';
-import { ElCard } from 'element-plus';
+// import { ElCard } from 'element-plus';
 import axios from 'axios';
 
 export default {
@@ -60,7 +66,7 @@ export default {
     components: {
         //ElRow,
         //ElCol,
-        ElCard,
+        //ElCard,
         //ElProgress
     },
     data() {
@@ -94,6 +100,9 @@ export default {
             searchQuery: '',
             searchResults: [],
             projects: null,
+            is_search: false,
+            isAllProjectsSelected: true,
+            isRecommendedSelected: false,
             colors: ['#FF6347', '#4682B4', '#32CD32', '#FFD700', '#6A5ACD', '#FF4500', '#20B2AA'],
         };
     },
@@ -101,6 +110,7 @@ export default {
     methods: {
         fetchProjects() {
             const baseUrl = 'http://127.0.0.1:5000/getProjects';  // 确保后端URL正确
+            this.is_search = false;
             axios.get(baseUrl)
                 .then(response => {
                     this.projects = response.data.map(project => {
@@ -127,6 +137,15 @@ export default {
                     this.searchResults = [];
                 });
         },
+        showSearchResults() {
+            this.is_search = true;
+            console.log(this.searchResults);
+            if (this.searchResults.length != 0) {
+                this.projects = this.projects.filter(project =>
+                    this.searchResults.some(result => result.id === project.id));
+            }
+            else this.fetchProjects();
+        },
 
         formatCurrency(value) {
             return `$${value.toFixed(2)}`;
@@ -151,7 +170,7 @@ export default {
                 .catch(error => {
                     console.error('访问记录保存失败:', error);
                 });
-            
+
             axios.post('http://localhost:5000/record', {
                 userId: this.$route.params.userId,
                 projectId: projectId
@@ -160,10 +179,34 @@ export default {
                     console.error('日志记录失败，请查看后端', error);
                 });
             this.$router.push({ path: `/${this.$route.params.userId}/project/${projectId}` });
+        },
+        showAllProjects() {
+            this.isAllProjectsSelected = true;
+            this.isRecommendedSelected = false;
+            this.fetchProjects(); // Fetch all projects again
+        },
+
+        showRecommendedProjects() {
+            this.isAllProjectsSelected = false;
+            this.isRecommendedSelected = true;
+            this.fetchInterestedProjects(); // Fetch recommended projects
+        },
+
+        fetchInterestedProjects() {
+            const userId = this.$route.params.userId; // Assuming user ID is available in the route params
+            axios.get(`http://localhost:5000/${userId}/interested_projects`)
+                .then(response => {
+                    const projectIds = response.data;
+                    this.projects = this.projects.filter(project => projectIds.includes(project.id));
+                })
+                .catch(error => {
+                    console.error('请求推荐项目数据失败:', error);
+                });
         }
     },
     mounted() {
         this.fetchProjects();
+        this.showAllProjects();
     }
 }
 </script>
@@ -176,7 +219,7 @@ export default {
 }
 
 .search-bar {
-    width: 40%;
+    width: 30%;
     padding-left: 20px;
     border: none;
     border-radius: 20px;
@@ -196,12 +239,29 @@ export default {
     font-weight: 700;
 }
 
+.project-toggle-button {
+    padding: 10px 20px;
+    margin-right: 5px;
+    border: none;
+    background-color: white;
+    /* Default background */
+    color: black;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.active {
+    background-color: #ccc;
+    /* Active state background */
+}
+
 .dropdown-menu {
     position: absolute;
     background-color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     width: 30%;
-    left: 48%;
+    left: 53.3%;
     transform: translateX(-50%);
     z-index: 100;
     border-radius: 5px;
@@ -211,10 +271,13 @@ export default {
     padding: 10px;
     cursor: pointer;
     font-size: smaller;
-    text-align: left; /* 文本左对齐 */
+    text-align: left;
+    /* 文本左对齐 */
     /* border-bottom: 1px solid #ddd; /* 添加灰色边框 */
-    margin: 0; /* 移除任何默认边距 */
-    box-sizing: border-box; /* 确保包括padding和border在内的总宽度和高度 */
+    margin: 0;
+    /* 移除任何默认边距 */
+    box-sizing: border-box;
+    /* 确保包括padding和border在内的总宽度和高度 */
 }
 
 .dropdown-item:not(:last-child) {
@@ -383,5 +446,22 @@ export default {
     /* 行高与进度条高度相同，使文字垂直居中 */
     padding-right: 5px;
     /* 文本与进度条右边界的距离 */
+}
+
+.project-toggle-button {
+    padding: 10px 20px;
+    margin-right: 5px;
+    border: none;
+    background-color: white;
+    /* Default background */
+    color: black;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.active {
+    background-color: #ccc;
+    /* Active state background */
 }
 </style>

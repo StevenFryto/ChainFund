@@ -7,7 +7,7 @@ CREATE TABLE user (
     email VARCHAR(255) NOT NULL,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     raised_amount DECIMAL(10, 2),
-    interest_matrix TEXT
+    interested_projects TEXT
 );
 
 -- 创建众筹项目表

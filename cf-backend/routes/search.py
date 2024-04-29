@@ -19,6 +19,9 @@ def search():
             sql = "SELECT id, title FROM project WHERE title LIKE %s"
             cursor.execute(sql, ("%" + query + "%",))
             result = cursor.fetchall()
+            print("result: ", result)
             return jsonify(result)
-    finally:
-        connection.close()
+    # finally:
+    #     connection.close()
+    except:
+        return jsonify({"status": "fail"}), 404

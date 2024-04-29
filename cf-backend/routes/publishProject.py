@@ -6,6 +6,8 @@ import json
 
 from config.config import DB_CONFIG
 
+from bert.inference import inference_user_ids
+
 
 # Blueprint配置
 publishProject_bp = Blueprint("publishProject", __name__)
@@ -22,7 +24,7 @@ def publish_project():
     surety_info = json.loads(request.form.get('suretyInfo'))
     project_info = json.loads(request.form.get('projectInfo'))
 
-    print(surety_info, '\n', project_info)
+    # print(surety_info, '\n', project_info)
 
     # 存储保证人头像
     surety_photo = request.files['suretyPhoto']
@@ -48,6 +50,15 @@ def publish_project():
     labels_str = ','.join([label for label in project_info['labels']])
     project_id = insert_project(project_info['userId'], surety_id, project_info['title'], project_info['description'], project_info['patientName'], project_info['patientIdCard'], project_info['patientGender'], project_info['patientBirth'], project_info['patientOccupation'], photos_str, labels_str, project_info['deadline'], project_info['targetAmount'])
 
+    # try:
+    print(project_info['description'], project_info['userId'])
+    top_user_ids = inference_user_ids(project_info['description'], project_info['userId'], 10)
+    top_user_ids = [int(item) for item in top_user_ids[0]]
+    # print(",".join(top_user_ids))
+    # except:
+    #     print("Fail in predict top users!")
+    #     pass
+
     if surety_id != -1 and project_id != -1:
         return jsonify({'status': True, 'id': project_id})
     else:
@@ -57,7 +68,7 @@ def publish_project():
 def insert_project(user_id, surety_id, title, description, patient_name, patient_id_card, patient_gender, patient_birth, patient_occupation, photos, label, deadline, target_amount):
     try:
         with connection.cursor() as cursor:
-            sql = "INSERT INTO project (user_id, surety_id, title, description, patient_name, patient_id_card, patient_gender, patient_birth, patient_occupation, photos, label, deadline, target_amount, current_amount) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            sql = "INSERT INTO project (user_id, surety_id, title, description, patient_name, patient_id_card, patient_gender, patient_birth, patient_occupation, photos, label, deadline, target_amount, current_amount) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
             cursor.execute(sql, (user_id, surety_id, title, description, patient_name, patient_id_card, patient_gender, patient_birth, patient_occupation, photos, label, deadline, target_amount, 0))
         connection.commit()
         return cursor.lastrowid
