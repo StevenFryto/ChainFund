@@ -51,9 +51,11 @@ def publish_project():
     project_id = insert_project(project_info['userId'], surety_id, project_info['title'], project_info['description'], project_info['patientName'], project_info['patientIdCard'], project_info['patientGender'], project_info['patientBirth'], project_info['patientOccupation'], photos_str, labels_str, project_info['deadline'], project_info['targetAmount'])
 
     # try:
-    print(project_info['description'], project_info['userId'])
+    # print(project_info['description'], project_info['userId'])
     top_user_ids = inference_user_ids(project_info['description'], project_info['userId'], 10)
-    top_user_ids = [int(item) for item in top_user_ids[0]]
+    # top_user_ids = [int(item) for item in top_user_ids[0]]
+    top_user_ids = [int(item) for item in top_user_ids[0] if int(item) < 12]
+    insert_interested_projects(project_id, top_user_ids)
     # print(",".join(top_user_ids))
     # except:
     #     print("Fail in predict top users!")
@@ -97,3 +99,18 @@ def insert_surety(name, id_card, phone, photo):
         connection.rollback()
         connection.close()
         return -1
+
+def insert_interested_projects(project_id, top_user_ids):
+    cursor = connection.cursor()
+    sql = """
+    UPDATE user
+    SET interested_projects = CASE
+        WHEN interested_projects IS NOT NULL AND interested_projects != '' THEN CONCAT(interested_projects, ',', %s)
+        ELSE %s
+    END
+    WHERE id IN (%s);
+    """
+    user_ids = ','.join([str(id) for id in top_user_ids])
+    project_id = str(project_id)
+    cursor.execute(sql, (project_id, project_id, user_ids))
+    connection.commit()
