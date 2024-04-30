@@ -17,7 +17,8 @@
     "timer": "^1.0.1",
     "timers": "^0.1.1",
     "vue": "^3.2.13",
-    "vue-data-ui": "^2.1.2",
+    "vue-danmaku": "^1.7.2",
+    "vue-data-ui": "^2.1.10",
     "vue-router": "^4.0.3",
     "vue3-danmaku": "^1.6.0",
     "vuex": "^4.0.0"

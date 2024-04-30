@@ -15,11 +15,14 @@ def search():
     if not query:
         return jsonify([])
     try:
+        connection.ping(True)
         with connection.cursor() as cursor:
             sql = "SELECT id, title FROM project WHERE title LIKE %s"
             cursor.execute(sql, ("%" + query + "%",))
             result = cursor.fetchall()
+            print("result: ", result)
             return jsonify(result)
+    except:
+        return jsonify({"status": "fail"}), 404
     finally:
-        # connection.close()
-        pass
+        connection.close()

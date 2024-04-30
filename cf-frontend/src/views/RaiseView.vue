@@ -296,8 +296,8 @@ export default {
     cursor: pointer;
     border-radius: 50%;
     background-color: #ddd;
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     margin: 0 auto;
     overflow: hidden;
     position: relative;
@@ -313,8 +313,8 @@ export default {
 }
 
 .photo-preview {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     /* 保持与.photo-upload-label一致 */
     object-fit: cover;
     border-radius: 50%;
@@ -364,6 +364,7 @@ export default {
     height: auto;
     object-fit: cover;
     border-radius: 5px;
+
 }
 
 .buttons {

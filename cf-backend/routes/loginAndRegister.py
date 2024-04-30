@@ -20,11 +20,13 @@ def login():
     # password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
         
     # 查询数据库中是否存在匹配的用户记录
+    connection.ping(True)
     with connection.cursor() as cursor:
         # 使用参数化查询以防止 SQL 注入攻击
         sql = "SELECT id FROM user WHERE username = %s AND password = %s"
         cursor.execute(sql, (username, password))
         userId = cursor.fetchone()
+        connection.close()
 
     if userId:
         return jsonify( {'status': True, 'id': userId['id']} )

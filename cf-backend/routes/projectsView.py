@@ -14,6 +14,7 @@ connection = pymysql.connect(**DB_CONFIG)
 @getProjects_bp.route("/getProjects", methods=["GET"])
 def get_projects():
     projects = []
+    connection.ping(True)
     try:
         with connection.cursor() as cursor:
             # 执行SQL查询
@@ -29,6 +30,6 @@ def get_projects():
                 row["label"] = row["label"].split(",")[:2]
                 projects.append(row)
     finally:
-        pass
+        connection.close()
     # print(projects)
     return jsonify(projects)

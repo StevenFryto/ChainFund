@@ -16,6 +16,7 @@ def getPersonalInfo():
     user_id = int(request.args.get('id'))
     connection = create_connection()  # 每个请求创建新的连接
     try:
+        connection.ping(True)
         with connection.cursor() as cursor:
             # 执行SQL查询获取用户信息
             user_sql = "SELECT * FROM user WHERE id = %s"
@@ -41,6 +42,7 @@ def getHistory():
     user_id = int(request.args.get('id'))
     connection = create_connection()  # 每个请求创建新的连接
     try:
+        connection.ping(True)
         with connection.cursor() as cursor:
             # SQL查询获取浏览记录
             history_sql = """
@@ -87,6 +89,7 @@ def deleteHistory():
 
     connection = create_connection()  # 为每个请求创建新的数据库连接
     try:
+        connection.ping(True)
         with connection.cursor() as cursor:
             # 根据 userId 和 projectId 删除记录
             delete_sql = "DELETE FROM record WHERE user_id = %s AND project_id = %s AND raised_amount = 0"

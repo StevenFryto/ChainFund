@@ -24,6 +24,7 @@ def donate():
     print(data)
 
     try:
+        connection.ping(True)
         with connection.cursor() as cursor:
             # 获取项目保证人的id
             select_sql = """
@@ -42,8 +43,30 @@ def donate():
             connection.commit()
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    finally:
+        connection.close()
 
-    block_hash = chainfund.insertRecord(args=[from_user, to_user, project_id, raised_amount, message])
+    try:
+        block_hash = chainfund.insertRecord(args=[from_user, to_user, project_id, raised_amount, message])
 
-    return jsonify({"status": True, "blockHash": block_hash})
+        # 修改最后一次记录表
+        connection.ping(True)
+        with connection.cursor() as cursor:
+            # 更新record表中最后一条记录的钱数值
+            update_sql = """
+                    UPDATE record
+                    SET money = %s
+                    WHERE time = (
+                        SELECT MAX(time) FROM record
+                    )
+            """
+            cursor.execute(update_sql, (raised_amount))
+            connection.commit()
+    except Exception as e:
+        print(e)
+        return jsonify({"status": False})
+    finally:
+        connection.close()
+
+    return jsonify({"status": True, "block": block_hash})
 

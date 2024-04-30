@@ -1,38 +1,39 @@
 <template>
     <div>
         <div class="project-details" v-if="project">
-            <el-card class="detail-card" v-show="showDetailCard">
+            <div class="detail-card" v-show="showDetailCard">
                 <div class="title">{{ project.title }}</div>
                 <div class="time-cards">
-                    <el-card class="time-card" shadow="hover">发布时间：{{ project.create_time }}</el-card>
-                    <el-card class="time-card" shadow="hover">截止时间：{{ project.deadline }}</el-card>
+                    <div class="time-card" shadow="hover">发布时间：{{ project.create_time }}</div>
+                    <div class="owner-card" @mouseover="handleMouseEnter" @mouseleave="handleMouseLeave">   
+                        <template v-if="showDetails">
+                            <div class="owner-details">
+                                <div>
+                                    <p><b>担保人信息</b></p>
+                                    <p>姓名：{{ project.surety_info.name }}</p>
+                                    <p>身份证号：{{ project.surety_info.id_card }}</p>
+                                    <p>联系方式：{{ project.surety_info.phone }}</p>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div class="patient-info">
+                                {{ project.patient_name }} ({{ project.patient_gender }}, {{ project.patient_birth }} 岁)
+                                &nbsp;&nbsp;&nbsp; {{ project.patient_occupation
+                                }}
+                            </div>
+                        </template>
+                    </div>
+                    <div class="time-card" shadow="hover">截止时间：{{ project.deadline }}</div>
                 </div>
                 <div class="funding-cards">
-                    <el-card class="money-card" shadow="hover">
+                    <div class="money-card" shadow="hover">
                         <p>目标金额: {{ formatCurrency(project.target_amount) }} &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
                             已筹得金额: {{
             formatCurrency(project.current_amount) }}</p>
-                    </el-card>
+                    </div>
                 </div>
-                <el-card class="owner-card" @mouseover="handleMouseEnter" @mouseleave="handleMouseLeave">
-                    <template v-if="showDetails">
-                        <div class="owner-details">
-                            <div>
-                                <p><b>担保人信息</b></p>
-                                <p>姓名：{{ project.surety_info.name }}</p>
-                                <p>身份证号：{{ project.surety_info.id_card }}</p>
-                                <p>联系方式：{{ project.surety_info.phone }}</p>
-                            </div>
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div class="patient-info">
-                            {{ project.patient_name }} ({{ project.patient_gender }}, {{ project.patient_birth }} 岁)
-                            &nbsp;&nbsp;&nbsp; {{ project.patient_occupation
-                            }}
-                        </div>
-                    </template>
-                </el-card>
+
                 <div class="project-images">
                     <img v-for="(img, index) in project.photos" :key="index" :src="img.src" alt="Project Image"
                         class="project-image" />
@@ -43,12 +44,12 @@
                 <button @click="openDonationDialog">进行捐款</button>
 
                 <div class="tags">
-                    <el-card v-for="(tag, index) in project.label" :key="index" class="tag"
+                    <div v-for="(tag, index) in project.label" :key="index" class="tag"
                         :style="{ backgroundColor: colors[index % colors.length] }" shadow="hover">
                         #&nbsp;{{ tag }}
-                    </el-card>
+                    </div>
                 </div>
-            </el-card>
+            </div>
 
             <div>
                 <el-dialog v-model="donationDialogVisible" title="捐款" width="550" @close="resetDonationDialog">
@@ -97,7 +98,24 @@
                         </div>
                     </template>
                 </el-dialog>
-
+                <el-dialog title="感谢您的捐款🙏下面是您本次捐款的区块信息" v-model="blockVisible" width="50%" center>
+                    <div class="dialog-content">
+                        <p>🟣 区块哈希 (Block Hash): {{ responseData.blockHash }}</p>
+                        <p>🟣 区块编号 (Block Number): {{ responseData.blockNumber }}</p>
+                        <p>🟣 发起账户 (From): {{ responseData.from }}</p>
+                        <p>🟣 接收账户 (To): {{ responseData.to }}</p>
+                        <p>🟣 消耗 Gas (Gas Used): {{ responseData.gasUsed }}</p>
+                        <p>🟣 剩余 Gas (Remaining Gas): {{ responseData.remainGas }}</p>
+                        <p>🟣 根 (Root): {{ responseData.root }}</p>
+                        <p>🟣 状态 (Status): {{ responseData.status }}</p>
+                        <p>🟣 状态消息 (Status Message): Success</p>
+                        <p>🟣 交易哈希 (Transaction Hash): {{ responseData.transactionHash }}</p>
+                        <p>🟣 交易索引 (Transaction Index): {{ responseData.transactionIndex }}</p>
+                    </div>
+                    <template #footer>
+                        <el-button type="primary" @click="blockVisible = false">关闭</el-button>
+                    </template>
+                </el-dialog>
             </div>
         </div>
         <div class="component" v-if="project">
@@ -115,7 +133,8 @@
 
 
 <script>
-import { ElCard, ElDialog, ElButton, ElInput, ElForm, ElFormItem } from 'element-plus';
+// import { ElCard, ElDialog, ElButton, ElInput, ElForm, ElFormItem } from 'element-plus';
+import { ElDialog, ElButton, ElInput, ElForm, ElFormItem } from 'element-plus';
 import axios from 'axios';
 // import ProjectFlow from '@/components/ProjectFlow.vue';
 import MessageWall from '@/components/MessageWall.vue';
@@ -123,7 +142,8 @@ import BubbleWall from '@/components/BubbleWall.vue';
 
 export default {
     components: {
-        ElCard, ElDialog, ElButton, ElInput, ElForm, ElFormItem,
+        // ElCard, 
+        ElDialog, ElButton, ElInput, ElForm, ElFormItem,
         // ProjectFlow, 
         MessageWall,
         BubbleWall
@@ -135,6 +155,7 @@ export default {
             showDetails: false,
             donationDialogVisible: false,   // 控制弹出框的显示与否
             innerVisible: false,            // 控制确认框的显示与否
+            blockVisible: false,            // 控制区块信息是否显示
             donationAmount: 10,             // 默认的捐款金额
             donationMessage: '',            // 捐赠者留言
             timeoutId: null,
@@ -145,8 +166,21 @@ export default {
             commonMessages: [
                 '人总会遇到很多无耐的事情，人生总有很多的不得也；未来的路上，还会有无数曲折；此时的你所碰到的挫折，在人生路上真的不算什么？祝早日安康。',
                 '惦记，无声，却很甘甜；问候，平常，却很温暖；祝福，遥远，却最贴心；在此送上我衷心的祝福，祝你：早日康复！',
-                '东风轻轻吹柳，桃花开了许久，不知见到没有，病毒世间少有，切忌四处游走，留意消毒洗手，病毒莫能长久，闲来挂念吾友，祝愿健康永久！'
-            ]
+                '东风轻轻吹柳，桃花开了许久，不知见到没有，病毒世间少有，切忌四处游走，留意消毒洗手，病毒莫能长久，闲来挂念吾友，祝愿健康永久！',
+            ],
+            responseData: {
+                blockHash: "0xbc0b40b260e8abacc3e310891b453b2579634c4d2e07154d20027bf516aff8a2",
+                blockNumber: "0x2a",
+                from: "0x2de5c210370daef452eb610af76c3a293ae1661f",
+                to: "0xf2818ae69ef667d120584b981a818b982cd6d7f5",
+                gasUsed: "0x44b0a",
+                remainGas: "0x0",
+                root: "0x6a75181852741c72cd7b954f5483c753f7da3fbf704bf7cb28e240988de5780e",
+                status: "0x0",
+                statusMsg: "Success",
+                transactionHash: "0xce2d5c0d8a0708b68fdcab7cf091184a2bb77e39790580f7876ce3cf4789f329",
+                transactionIndex: "0x0"
+            },
         };
     },
     methods: {
@@ -174,29 +208,6 @@ export default {
                     this.error = error;
                     console.error('请求错误:', error);
                 });
-            /*
-            // 模拟的获取数据逻辑
-            return {
-                id: id,
-                title: '战胜疾病：共同支持健康恢复',
-                create_time: '2024-4-21',
-                deadline: '2024-7-31',
-                patient_name: '李明宇',
-                patient_birth: 44,
-                patient_gender: '男',
-                patient_occupation: '教师',
-                surety_info: { name: '苏萨', phone: '123123123', id_card: '110110110110' },
-                target_amount: 100000,
-                current_amount: 85000,
-                photos: [
-                    require('@/assets/sample_1.webp'),
-                    require('@/assets/sample_3.webp'),
-                    require('@/assets/sample_4.webp'),
-                    // 更多图片
-                ],
-                description: '这个众筹项目专注于帮助患有罕见的遗传性血液病——地中海贫血的患者。地中海贫血是一种由基因突变引起的疾病，导致体内不能正常生产血红蛋白，从而引起贫血、疲劳和发展迟缓。如果不进行治疗，这种病可能会威胁生命，治疗方法通常包括定期的血液输注和可能的骨髓移植。',
-                label: ['紧急', '健康', '教育']
-            };*/
         },
         formatCurrency(value) {
             return `$${value.toFixed(2)}`;
@@ -230,16 +241,20 @@ export default {
             };
             axios.post('http://127.0.0.1:5000/donate', donationData) // 发送捐款请求
                 .then((response) => {
-                    // alert(`捐款成功，您的区块哈希为：\n ${response.data.blockHash}`);
-                    alert(response.data.blockHash)
-                    console.log(response.data.blockHash);
-                    const projectId = this.$route.params.id;
-                    this.project = this.fetchProject(projectId);
-                    this.showDetailCard = true; // 捐款后再次显示detail-card
-                    this.innerVisible = false;
-                    this.donationDialogVisible = false; // 关闭弹出框
-                }
-                )
+                    // alert(typeof response.data)
+                    // console.log(response.data.block);
+                    if (response.data.status === true) {
+                        this.responseData = response.data.block;
+                        const projectId = this.$route.params.id;
+                        this.project = this.fetchProject(projectId);
+                        this.showDetailCard = true; // 捐款后再次显示detail-card
+                        this.innerVisible = false;
+                        this.donationDialogVisible = false; // 关闭弹出框
+                        this.blockVisible = true;
+                    } else {
+                        alert("捐款错误，请稍后重试！")
+                    }
+                })
                 .catch((error) => {
                     console.error('捐款失败:', error);
                 });
@@ -298,7 +313,10 @@ export default {
     font-size: xx-large;
     font-weight: bolder;
     margin-top: 20px;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #000;
 }
 
 .project-details {
@@ -339,15 +357,15 @@ export default {
 .time-cards {
     display: flex;
     justify-content: space-between;
-    margin-left: 30%;
-    margin-right: 30%;
+    margin-left: 18%;
+    margin-right: 18%;
     margin-bottom: 10px;
 }
 
 .time-card {
     /* border: 1px solid #7FC1BE; */
     border-radius: 5px;
-    padding: 10px;
+    /* padding: 10px; */
     color: grey;
     font-weight: bold;
     border-radius: 10px;
@@ -358,18 +376,17 @@ export default {
     border-radius: 5px;
     position: relative;
     cursor: pointer;
-    margin-left: 30%;
-    margin-right: 30%;
 }
 
 .owner-details {
     display: flex;
     justify-content: space-between;
     padding-left: 20px;
+    padding-right: 20px;
     padding-top: 5px;
     padding-bottom: 5px;
     background-color: white;
-    border: 2px solid red;
+    border: 2px solid #42b983;
     border-radius: 15px;
     text-align: left;
     font-weight: 600;
@@ -393,12 +410,12 @@ export default {
 .project-images {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: space-evenly;
     /* 保持图片间有间隔 */
     margin-bottom: 40px;
     margin-top: 40px;
-    margin-left: 20%;
-    margin-right: 20%;
+    margin-left: 10%;
+    margin-right: 10%;
 }
 
 .project-image {
@@ -673,5 +690,19 @@ button {
     box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.2);
 
     cursor: pointer;
+}
+
+.dialog-content {
+    color: #333;
+    width: 80%;
+    padding-left: 10%;
+}
+
+.dialog-content p {
+    margin: 20px 0;
+}
+
+.dialog-content p span {
+    color: #42b983;
 }
 </style>

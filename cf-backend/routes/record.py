@@ -16,6 +16,7 @@ def record():
     user_id = data.get('userId')
     project_id = data.get('projectId')
     try:
+        connection.ping(True)
         with connection.cursor() as cursor:
             # 执行SQL查询
             sql = "INSERT INTO record(user_id, project_id, raised_amount) VALUES (%s, %s, %s)"
@@ -25,5 +26,7 @@ def record():
         print('Error inserting record', e)
         connection.rollback()
         return jsonify({'status': 'error'})
+    finally:
+        connection.close()
 
     return jsonify({'status': 'success'})
