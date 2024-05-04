@@ -11,7 +11,7 @@ client = BcosClient()
 print(client.getinfo())
 
 # 定义智能合约地址及abi
-to_address = "0xf2818ae69ef667d120584b981a818b982cd6d7f5"
+to_address = "0xa2a0fc2a849613f56faf7a2f315bd7749bf95c62"
 contractFile = "./blockchain/contracts/ChainFund_2.abi"
 abi_parser = DatatypeParser()
 abi_parser.load_abi_file(contractFile)
@@ -21,6 +21,7 @@ contract_abi = abi_parser.contract_abi
 # 插入资金流动记录
 def insertRecord(args : list):
     result = client.sendRawTransactionGetReceipt(to_address, contract_abi, fn_name="insertRecord", args=args)
+    # result = client.sendRawTransaction(to_address, contract_abi, fn_name="insertRecord", args=args)
     print(result)
     # return result['blockHash']
     return result

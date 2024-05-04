@@ -8,7 +8,7 @@ import random
 # 定义一个函数，为单个数据项添加publisher属性
 def add_publisher(data_item, user_id_to_avoid):
     # 假设publisher ID范围为001到100，除了要避免的user_id
-    possible_ids = [f"{i:03}" for i in range(1, 101) if f"{i:03}" != user_id_to_avoid]
+    possible_ids = [f"{i:03}" for i in range(1, 51) if f"{i:03}" != user_id_to_avoid]
     
     # 为数据项添加一个随机选择的publisher ID
     data_item["publisher_id"] = random.choice(possible_ids)
@@ -19,7 +19,7 @@ def add_publisher(data_item, user_id_to_avoid):
 
 def main():
 
-    with open('data.json', 'r', encoding='utf-8') as f:
+    with open('D:\coding_program\Projects\ChainFund\cf-backend\\bert\data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
 
     data = list(map(lambda item: add_publisher(item, item['user_id']), data))
@@ -33,6 +33,7 @@ def main():
     # 按用户ID分组样本
     grouped_data = {}
     for item in data:
+        item["user_id"] = item["user_id"].replace('u', '')
         user_id = item["user_id"]
         if user_id in grouped_data:
             grouped_data[user_id].append(item)
@@ -54,7 +55,7 @@ def main():
     # 使用 collate_fn 函数创建 DataLoader
     dataloader = DataLoader(dataset_resampled_data, batch_size=30, shuffle=True, collate_fn=collate_fn)
 
-    model = ContrastiveAndPredictiveModel(num_users=10000, embedding_size=64)
+    model = ContrastiveAndPredictiveModel(num_users=60, embedding_size=64)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     loss_weights = DynamicLossWeights(torch.tensor([0.25, 0.5, 0.25]))

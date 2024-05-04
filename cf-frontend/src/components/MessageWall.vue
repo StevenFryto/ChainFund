@@ -18,6 +18,7 @@ export default {
     },
     data() {
         return {
+            needFetch: false,
             danmus: ref([
                 { "username": "且放白鹿", "message": "愿你的每一天都充满阳光" },
                 { "username": "红烛", "message": "坚定信心，病魔终将退去，愿你在康复的路上步步为赢🌹" },
@@ -44,14 +45,18 @@ export default {
     },
     methods: {
         fetchMessages() {
-            axios.get(`http://127.0.0.1:5000/getMessage/${this.$route.params.id}`) // 发送捐款请求
-                .then((response) => {
-                    console.log(response.data.results);
-                    // this.danmus.value = response.data.results;
-                })
-                .catch((error) => {
-                    console.error('捐款失败:', error);
-                });
+            if (this.needFetch) {
+                axios.get(`http://127.0.0.1:5000/getMessage/${this.$route.params.id}`) // 发送捐款请求
+                    .then((response) => {
+                        console.log(response.data.results);
+                        // this.danmus.value = response.data.results;
+                    })
+                    .catch((error) => {
+                        console.error('捐款失败:', error);
+                    });
+            } else {
+                console.log("已加载缓存留言弹幕");
+            }
         }
     },
     mounted() {

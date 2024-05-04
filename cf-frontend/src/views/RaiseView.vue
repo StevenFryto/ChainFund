@@ -8,7 +8,7 @@
                     <input type="file" id="photo" @change="previewPhoto" accept="image/*" class="photo-upload">
                     <label for="photo" class="photo-upload-label">
                         <img v-if="suretyPhotoPreview" :src="suretyPhotoPreview" alt="保证人照片预览" class="photo-preview" />
-                        <span v-else class="photo-placeholder">点击此处上传保证人照片</span>
+                        <span v-else class="photo-placeholder">点击此处上传保证人持身份证照片</span>
                     </label>
                 </div>
             </section>
@@ -16,15 +16,15 @@
                 <!-- Guarantor's form fields -->
                 <div class="form-field">
                     <label for="name">保证人姓名</label>
-                    <input type="text" id="name" placeholder="请填写保证人姓名" v-model="suretyInfo.name" required>
+                    <input type="text" id="name" placeholder="请填写保证人姓名" v-model="suretyInfo.name" >
                 </div>
                 <div class="form-field">
                     <label for="id">保证人身份证号</label>
-                    <input type="text" id="id" placeholder="请填写保证人身份证号" v-model="suretyInfo.idCard" required>
+                    <input type="text" id="id" placeholder="请填写保证人身份证号" v-model="suretyInfo.idCard" >
                 </div>
                 <div class="form-field">
                     <label for="phone">保证人手机号码</label>
-                    <input type="tel" id="phone" placeholder="请填写手机号码" v-model="suretyInfo.phone" required>
+                    <input type="tel" id="phone" placeholder="请填写手机号码" v-model="suretyInfo.phone" >
                 </div>
 
                 <button type="submit" class="submit-button">下一步</button>
@@ -35,19 +35,19 @@
                 <h1 class="username-title">📇 众筹基本信息</h1>
                 <div class="form-field">
                     <label for="title">众筹标题</label>
-                    <textarea id="title" rows="4" placeholder="请输入众筹请求标题" v-model="projectInfo.title" required></textarea>
+                    <textarea id="title" rows="4" placeholder="请输入众筹请求标题" v-model="projectInfo.title" ></textarea>
                 </div>
                 <div class="form-field">
                     <label for="description">病情描述</label>
-                    <textarea id="description" rows="4" placeholder="请输入病情描述" v-model="projectInfo.description" required></textarea>
+                    <textarea id="description" rows="4" placeholder="请输入病情描述" v-model="projectInfo.description" ></textarea>
                 </div>
                 <div class="form-field">
                     <label for="cost-estimate">治疗费用预估（人民币）</label>
-                    <input type="number" id="cost-estimate" placeholder="请填写预估治疗费用" v-model="projectInfo.targetAmount" required>
+                    <input type="number" id="cost-estimate" placeholder="请填写预估治疗费用" v-model="projectInfo.targetAmount" >
                 </div>
                 <div class="form-field">
                     <label for="deadline">众筹截至日期</label>
-                    <input type="date" id="deadline" v-model="projectInfo.deadline" required>
+                    <input type="date" id="deadline" v-model="projectInfo.deadline" >
                 </div>
                 <div class="form-field">
                     <label for="patient-photos">患者目前状况照片（最多可上传9张）</label>
@@ -70,15 +70,15 @@
                 <!-- Patient's form fields -->
                 <div class="form-field">
                     <label for="patient-name">患者姓名</label>
-                    <input type="text" id="patient-name" placeholder="请填写患者姓名" v-model="projectInfo.patientName" required>
+                    <input type="text" id="patient-name" placeholder="请填写患者姓名" v-model="projectInfo.patientName" >
                 </div>
                 <div class="form-field">
                     <label for="patient-id">患者身份证号</label>
-                    <input type="text" id="patient-id" placeholder="请填写患者身份证号" v-model="projectInfo.patientIdCard" required>
+                    <input type="text" id="patient-id" placeholder="请填写患者身份证号" v-model="projectInfo.patientIdCard" >
                 </div>
                 <div class="form-field">
                     <label for="patient-gender">患者性别</label>
-                    <select id="patient-gender" class="form-input" v-model="projectInfo.patientGender" required>
+                    <select id="patient-gender" class="form-input" v-model="projectInfo.patientGender" >
                         <option value="">请选择性别</option>
                         <option value="male">男</option>
                         <option value="female">女</option>
@@ -86,11 +86,11 @@
                 </div>
                 <div class="form-field">
                     <label for="patient-birthdate">患者出生日期</label>
-                    <input type="date" id="patient-birthdate" v-model="projectInfo.patientBirth" required>
+                    <input type="date" id="patient-birthdate" v-model="projectInfo.patientBirth" >
                 </div>
                 <div class="form-field">
                     <label for="patient-job">患者职业</label>
-                    <input type="text" id="patient-job" placeholder="请填写患者职业" v-model="projectInfo.patientOccupation" required>
+                    <input type="text" id="patient-job" placeholder="请填写患者职业" v-model="projectInfo.patientOccupation" >
                 </div>
                 <div class="buttons">
                     <button type="submit" @click="lastStep" class="submit-button">上一步</button>
@@ -294,9 +294,9 @@ export default {
 .photo-upload-label {
     display: inline-block;
     cursor: pointer;
-    border-radius: 50%;
+    /* border-radius: 50%; */
     background-color: #ddd;
-    width: 200px;
+    width: 300px;
     height: 200px;
     margin: 0 auto;
     overflow: hidden;
@@ -364,7 +364,6 @@ export default {
     height: auto;
     object-fit: cover;
     border-radius: 5px;
-
 }
 
 .buttons {

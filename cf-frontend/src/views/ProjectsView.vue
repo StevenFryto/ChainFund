@@ -56,47 +56,12 @@
 </template>
 
 <script>
-// import { ElRow, ElCol, ElCard, ElProgress } from 'element-plus';
-// import { ElCard, ElProgress } from 'element-plus';
-// import { ElCard } from 'element-plus';
 import axios from 'axios';
 
 export default {
     name: 'ProjectsView',
-    components: {
-        //ElRow,
-        //ElCol,
-        //ElCard,
-        //ElProgress
-    },
     data() {
         return {
-            /* projects: [
-                {
-                    id: 1,
-                    title: '帮助山区儿童读书',
-                    image: require('@/assets/logo.png'),
-                    target_amount: 10000,
-                    current_amount: 4500,
-                    label: ['教育', '儿童', '山区']
-                },
-                {
-                    id: 2,
-                    title: '城市无家可归者援助',
-                    image: require('@/assets/logo.png'),
-                    target_amount: 8000,
-                    current_amount: 5600,
-                    label: ['援助', '城市', '无家可归']
-                },
-                {
-                    id: 3,
-                    title: '清洁海洋行动',
-                    image: require('@/assets/logo.png'),
-                    target_amount: 15000,
-                    current_amount: 3000,
-                    label: ['海洋', '清洁']
-                }
-            ],*/
             searchQuery: '',
             searchResults: [],
             projects: null,
@@ -158,18 +123,6 @@ export default {
             return `${value_1.toFixed(0)}`
         },
         navigateToProject(projectId) {
-            // const visitData = {
-            //     user_id: this.$route.params.userId,
-            //     project_id: projectId,
-            //     raised_amount: 0,
-            //     message: 'visit',
-            // };
-            // axios.post('http://127.0.0.1:5000/donate', visitData)
-            //     .then()
-            //     .catch(error => {
-            //         console.error('访问记录保存失败:', error);
-            //     });
-
             axios.post('http://localhost:5000/record', {
                 userId: this.$route.params.userId,
                 projectId: projectId
@@ -205,6 +158,7 @@ export default {
     },
     mounted() {
         this.fetchProjects();
+        this.needFetch = false;
         this.showAllProjects();
     }
 }

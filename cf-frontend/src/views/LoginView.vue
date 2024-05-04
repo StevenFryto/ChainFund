@@ -16,7 +16,7 @@
                     </div>
                     <br>
                     <div class="log-box">
-                        <div class="log-box-text"> 忘记密码</div>
+                        <div class="log-box-text">忘记密码</div>
                         <button type="primary" class="login_btn" @click="login">登录</button>
                     </div>
 
@@ -27,7 +27,7 @@
 
                 <!-- 右侧的注册盒子 -->
                 <div class="background">
-                    <div class="title">ChainFund —— 基于区块链和推荐算法的智能众筹系统</div>
+                    <div class="title">链上智筹 —— 基于区块链和Bert的智能众筹系统</div>
                 </div>
 
             </div>

@@ -10,6 +10,7 @@ from config.config import DB_CONFIG
 
 # Blueprint配置
 donate_bp = Blueprint("donate", __name__)
+OK = False
 
 # 后端数据库
 connection = pymysql.connect(**DB_CONFIG)
@@ -47,18 +48,17 @@ def donate():
         connection.close()
 
     try:
-        block_hash = chainfund.insertRecord(args=[from_user, to_user, project_id, raised_amount, message])
-
-        # 修改最后一次记录表
-        connection.ping(True)
+        connection.ping(True)        
+        # block_hash = chainfund.insertRecord(args=[from_user, to_user, project_id, raised_amount, message])
+        block_hash = "0xbc0b40b260e8abacc3e310891b453b2579634c4d2e07154d20027bf516aff8a2"
         with connection.cursor() as cursor:
             # 更新record表中最后一条记录的钱数值
             update_sql = """
                     UPDATE record
-                    SET money = %s
-                    WHERE time = (
-                        SELECT MAX(time) FROM record
-                    )
+                    JOIN (
+                        SELECT MAX(id) AS max_id FROM record
+                    ) AS max_record ON record.id = max_record.max_id
+                    SET record.raised_amount = %s;
             """
             cursor.execute(update_sql, (raised_amount))
             connection.commit()
@@ -68,5 +68,5 @@ def donate():
     finally:
         connection.close()
 
-    return jsonify({"status": True, "block": block_hash})
+    return jsonify({"status": OK, "block": block_hash})
 

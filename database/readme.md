@@ -4,36 +4,37 @@
 
 ### 用户user
 
-| 字段            | 描述         |
-| --------------- | ------------ |
-| id              | 主键         |
-| avatar          | 头像         |
-| username        | 用户名       |
-| password        | 密码         |
-| email           | 邮箱         |
-| create_time     | 创建时间     |
-| raised_amount   | 已捐出的金额 |
-| interest_matrix | 兴趣矩阵     |
+| 字段              | 类型           | 描述         |
+| ----------------- | -------------- | ------------ |
+| Id                | INT            | 主键         |
+| avatar            | VARCHAR(255)   | 头像         |
+| username          | VARCHAR(255)   | 用户名       |
+| password          | VARCHAR(255)   | 密码         |
+| email             | VARCHAR(255)   | 邮箱         |
+| create_time       | DATETIME       | 创建时间     |
+| raised_amount     | DECIMAL(10, 2) | 已捐出的金额 |
+| interest_projects | TEXT           | 兴趣矩阵     |
 
 ### 众筹项目project
 
-| 字段            | 描述             |
-| --------------- | ---------------- |
-| id              | 主键             |
-| surety_id      | 保证人id           |
-| title           | 标题             |
-| description     | 描述             |
-| patient_name       | 患者姓名       |
-| patient_id_card   | 患者身份证号 |
-| patient_gender     | 患者性别       |
-| patient_birth        | 患者出生日期       |
-| patient_occupation | 患者职业       |
-| photos         | 患者目前状况照片 |
-| label           | 小标签           |
-| create_time     | 创建时间         |
-| deadline        | 截止日期         |
-| target_amount   | 目标金额         |
-| current_amount  | 已经筹到的金额   |
+| 字段            | 类型       | 描述             |
+| --------------- | ---------------- | --------------- |
+| id              | INT           | 主键             |
+| user_id | INT | 发布用户id |
+| surety_id      | INT   | 保证人id           |
+| title           | VARCHAR(255) | 标题             |
+| description     | VARCHAR(255) | 描述             |
+| patient_name       | VARCHAR(100) | 患者姓名       |
+| patient_id_card   | VARCHAR(20) | 患者身份证号 |
+| patient_gender     | ENUM('male', 'female', 'other') | 患者性别       |
+| patient_birth        | DATE | 患者出生日期       |
+| patient_occupation | VARCHAR(255) | 患者职业       |
+| photos         | TEXT     | 患者目前状况照片 |
+| label           | VARCHAR(255) | 小标签           |
+| create_time     | DATETIME | 创建时间         |
+| deadline        | DATETIME | 截止日期         |
+| target_amount   | DECIMAL(10, 2) | 目标金额         |
+| current_amount  | DECIMAL(10, 2) | 已经筹到的金额   |
 
 说明
 
@@ -50,23 +51,24 @@
 
 ### 保证人信息surety
 
-| 字段       | 描述       |
-| ---------- | ---------- |
-| id         | 主键       |
-| name     | 保证人姓名       |
-| id_card  | 保证人身份证号码 |
-| phone    | 保证人联系方式   |
-| photo | 保证人照片 |
+| 字段       | 类型     | 描述       |
+| ---------- | ---------- | ---------- |
+| id         | INT      | 主键       |
+| name     | VARCHAR(255) | 保证人姓名       |
+| id_card  | VARCHAR(20) | 保证人身份证号码 |
+| phone    | VARCHAR(20) | 保证人联系方式   |
+| photo | VARCHAR(255) | 保证人照片 |
 
 
 ### 浏览记录表record
 
-| 字段          | 描述           |
-| ------------- | -------------- |
-| user_id       | 用户id         |
-| project_id    | 项目id         |
-| duration      | 浏览时间       |
-| raised_amount | 本次捐赠的金额 |
+| 字段          | 类型           | 描述           |
+| ------------- | -------------- | -------------- |
+| user_id       | INT            | 用户id         |
+| project_id    | INT            | 项目id         |
+| duration      | DATETIME       | 浏览时间       |
+| raised_amount | DECIMAL(10, 2) | 本次捐赠的金额 |
+| message       | TEXT           | 捐款时留言     |
 
 ### 建库脚本
 

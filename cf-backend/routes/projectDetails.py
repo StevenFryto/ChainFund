@@ -28,7 +28,7 @@ def fetch_project(id):
             # 如果项目存在
             if result:
                 # 执行SQL查询获取担保人信息
-                surety_sql = "SELECT name, id_card, phone FROM surety WHERE id = %s"
+                surety_sql = "SELECT name, id_card, phone, photo FROM surety WHERE id = %s"
                 cursor.execute(surety_sql, (result['surety_id'],))
                 surety_result = cursor.fetchone()
 
@@ -38,7 +38,8 @@ def fetch_project(id):
                     result['surety_info'] = {
                         'name': surety_result['name'],
                         'phone': surety_result['phone'],
-                        'id_card': surety_result['id_card']
+                        'id_card': surety_result['id_card'],
+                        'photo': surety_result['photo']
                     }
 
                 # 处理项目信息中的其他字段

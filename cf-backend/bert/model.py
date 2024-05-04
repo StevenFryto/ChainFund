@@ -12,8 +12,7 @@ torch.manual_seed(0)
 np.random.seed(0)
 random.seed(0)
 
-model_path = './checkpoints/bert'
-# Load the tokenizer and model from your checkpoint
+model_path = '.\\cf-backend\\bert\\checkpoints\\bert'
 tokenizer = BertTokenizer.from_pretrained(model_path)
 bert_model = BertModel.from_pretrained(model_path)
 
@@ -34,25 +33,22 @@ class MultiHeadAttention(nn.Module):
         N = queries.shape[0]
         value_len, key_len, query_len = values.shape[1], keys.shape[1], queries.shape[1]
 
-        # Split the embedding into self.heads different pieces
         values = values.reshape(N, value_len, self.heads, self.head_dim)
         keys = keys.reshape(N, key_len, self.heads, self.head_dim)
         queries = queries.reshape(N, query_len, self.heads, self.head_dim)
 
-        # Matrix multiplication for query and keys, and scaling by square root of head_dim
-        energy = torch.einsum("nqhd,nkhd->nhqk", [queries, keys])  # Shape: (N, heads, query_len, key_len)
-        attention = torch.softmax(energy / (self.embed_size ** (1 / 2)), dim=-1)  # Apply softmax to turn scores into probabilities
+        energy = torch.einsum("nqhd,nkhd->nhqk", [queries, keys])
+        attention = torch.softmax(energy / (self.embed_size ** (1 / 2)), dim=-1)
 
-        # Multiply attention with values
-        out = torch.einsum("nhql,nlhd->nqhd", [attention, values])  # Shape: (N, query_len, heads, head_dim)
+        out = torch.einsum("nhql,nlhd->nqhd", [attention, values])
         out = out.reshape(N, query_len, self.heads * self.head_dim)
         return self.fc_out(out)
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, embed_size, heads):
         super(MultiHeadAttention, self).__init__()
-        self.embed_size = embed_size  # Example: 768
-        self.heads = heads            # Example: 4
+        self.embed_size = embed_size  # : 768
+        self.heads = heads            # : 4
         self.head_dim = embed_size // heads  # 768 // 4 = 192
         
         self.values = nn.Linear(self.head_dim, self.head_dim, bias=False)  # [192 -> 192]
@@ -75,7 +71,7 @@ class MultiHeadAttention(nn.Module):
         attention = torch.softmax(energy / (self.embed_size ** (1 / 2)), dim=3)
         # out: [N, query_len, heads, head_dim]
         out = torch.einsum("nhql,nlhd->nqhd", [attention, values]).reshape(N, query_len, self.heads * self.head_dim)
-        # final out: [N, query_len, embed_size]
+        # 最终结果: [N, query_len, embed_size]
         return self.fc_out(out)
 
 class ContrastiveAndPredictiveModel(nn.Module):
@@ -99,9 +95,8 @@ class ContrastiveAndPredictiveModel(nn.Module):
         pos_features = self.attention(pos_embedded, pos_embedded, pos_embedded)
         neg_features = self.attention(neg_embedded, neg_embedded, neg_embedded)
 
-        # Reduce sequence dimension by taking mean
-        pos_features = pos_features.mean(dim=1)  # Reduce to [batch_size, 768]
-        neg_features = neg_features.mean(dim=1)  # Reduce to [batch_size, 768]
+        pos_features = pos_features.mean(dim=1)  # 减少到 [batch_size, 768]
+        neg_features = neg_features.mean(dim=1)  # 减少到 [batch_size, 768]
 
         pos_features = F.leaky_relu(self.fc_info(pos_features))
         neg_features = F.leaky_relu(self.fc_info(neg_features))
@@ -133,7 +128,7 @@ class DynamicLossWeights:
 
 
 def train(model, dataloader, optimizer, loss_weights):
-    for epoch in range(1):
+    for epoch in range(10):
         epoch_losses = []
         for user_ids, publisher_id, pos_texts, neg_texts, durations in dataloader:
             true_user_ids = publisher_id
@@ -157,5 +152,5 @@ def train(model, dataloader, optimizer, loss_weights):
         mean_losses = torch.mean(epoch_losses_tensor, dim=0)
         loss_weights.update_weights(mean_losses)
 
-    print(f'Epoch {epoch+1}, Loss: {total_loss.item()}, Weights: {loss_weights.weights.numpy()}')
-    torch.save(model.state_dict(), './checkpoints/model_1.pth')
+        print(f'Epoch {epoch+1}, Loss: {total_loss.item()}, Weights: {loss_weights.weights.numpy()}')
+    torch.save(model.state_dict(), '.\\cf-backend\\bert\\checkpoints\\model_10.pth')

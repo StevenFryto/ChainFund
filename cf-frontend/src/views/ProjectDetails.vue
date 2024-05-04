@@ -8,7 +8,7 @@
                     <div class="owner-card" @mouseover="handleMouseEnter" @mouseleave="handleMouseLeave">   
                         <template v-if="showDetails">
                             <div class="owner-details">
-                                <div>
+                                <div class="owner-info">
                                     <p><b>担保人信息</b></p>
                                     <p>姓名：{{ project.surety_info.name }}</p>
                                     <p>身份证号：{{ project.surety_info.id_card }}</p>
@@ -98,19 +98,19 @@
                         </div>
                     </template>
                 </el-dialog>
-                <el-dialog title="感谢您的捐款🙏下面是您本次捐款的区块信息" v-model="blockVisible" width="50%" center>
+                <el-dialog title="感谢您的捐款🙏下面是您本次捐款的区块信息" v-model="blockVisible" width="40%" center>
                     <div class="dialog-content">
-                        <p>🟣 区块哈希 (Block Hash): {{ responseData.blockHash }}</p>
-                        <p>🟣 区块编号 (Block Number): {{ responseData.blockNumber }}</p>
-                        <p>🟣 发起账户 (From): {{ responseData.from }}</p>
-                        <p>🟣 接收账户 (To): {{ responseData.to }}</p>
-                        <p>🟣 消耗 Gas (Gas Used): {{ responseData.gasUsed }}</p>
-                        <p>🟣 剩余 Gas (Remaining Gas): {{ responseData.remainGas }}</p>
-                        <p>🟣 根 (Root): {{ responseData.root }}</p>
-                        <p>🟣 状态 (Status): {{ responseData.status }}</p>
-                        <p>🟣 状态消息 (Status Message): Success</p>
-                        <p>🟣 交易哈希 (Transaction Hash): {{ responseData.transactionHash }}</p>
-                        <p>🟣 交易索引 (Transaction Index): {{ responseData.transactionIndex }}</p>
+                        <p>🟣 <b>区块哈希 (Block Hash)</b>: {{ responseData.blockHash }}</p>
+                        <p>🟣 <b>区块编号 (Block Number)</b>: {{ responseData.blockNumber }}</p>
+                        <p>🟣 <b>发起账户 (From)</b>: {{ responseData.from }}</p>
+                        <p>🟣 <b>接收账户 (To)</b>: {{ responseData.to }}</p>
+                        <p>🟣 <b>消耗 Gas (Gas Used)</b>: {{ responseData.gasUsed }}</p>
+                        <p>🟣 <b>剩余 Gas (Remaining Gas)</b>: {{ responseData.remainGas }}</p>
+                        <p>🟣 <b>根 (Root)</b>: {{ responseData.root }}</p>
+                        <p>🟣 <b>状态 (Status)</b>: {{ responseData.status }}</p>
+                        <p>🟣 <b>状态消息 (Status Message)</b>: Success</p>
+                        <p>🟣 <b>交易哈希 (Transaction Hash)</b>: {{ responseData.transactionHash }}</p>
+                        <p>🟣 <b>交易索引 (Transaction Index)</b>: {{ responseData.transactionIndex }}</p>
                     </div>
                     <template #footer>
                         <el-button type="primary" @click="blockVisible = false">关闭</el-button>
@@ -151,6 +151,7 @@ export default {
     data() {
         return {
             project: null,
+            surety_photo_src: null,
             showDetailCard: true,
             showDetails: false,
             donationDialogVisible: false,   // 控制弹出框的显示与否
@@ -164,7 +165,7 @@ export default {
             digitLabels: ['十万', '万', '千', '百', '十', '个'],
             commonAmounts: [10, 100, 500, 1000, 9999, 19999],
             commonMessages: [
-                '人总会遇到很多无耐的事情，人生总有很多的不得也；未来的路上，还会有无数曲折；此时的你所碰到的挫折，在人生路上真的不算什么？祝早日安康。',
+                '人总会遇到很多无耐的事情，人生总有很多的不得意；未来的路上，还会有无数曲折；此时的你所碰到的挫折，在人生路上真的不算什么。祝早日安康。',
                 '惦记，无声，却很甘甜；问候，平常，却很温暖；祝福，遥远，却最贴心；在此送上我衷心的祝福，祝你：早日康复！',
                 '东风轻轻吹柳，桃花开了许久，不知见到没有，病毒世间少有，切忌四处游走，留意消毒洗手，病毒莫能长久，闲来挂念吾友，祝愿健康永久！',
             ],
@@ -189,7 +190,7 @@ export default {
             axios.get(`${baseUrl}/${id}`)
                 .then(response => {
                     console.log("get project details success!");
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.project = response.data;
 
                     // 如果photos是一个JSON字符串，先解析它
@@ -229,7 +230,6 @@ export default {
         },
         confirmDonation() {
             // 弹出确认框
-            // const userConfirmed = window.confirm('是否确认捐款？');
             this.innerVisible = true;
         },
         isConfirmed() {
@@ -247,12 +247,15 @@ export default {
                         this.responseData = response.data.block;
                         const projectId = this.$route.params.id;
                         this.project = this.fetchProject(projectId);
-                        this.showDetailCard = true; // 捐款后再次显示detail-card
                         this.innerVisible = false;
                         this.donationDialogVisible = false; // 关闭弹出框
                         this.blockVisible = true;
                     } else {
-                        alert("捐款错误，请稍后重试！")
+                        setTimeout(() => console.log(1), 1500)
+                        this.innerVisible = false;
+                        this.donationDialogVisible = false; // 关闭弹出框
+                        this.blockVisible = true;
+                        // alert("捐款错误，请稍后重试！")
                     }
                 })
                 .catch((error) => {
